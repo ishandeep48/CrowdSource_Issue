@@ -39,7 +39,7 @@ export default function User() {
     width: "500px",
     height: "500px",
   };
-  const mapClickHandler =(e) =>{
+  const mapClickHandler = (e) => {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
     setFormData({
@@ -49,7 +49,7 @@ export default function User() {
         lng: lng,
       },
     });
-  }
+  };
   return (
     <>
       <input
@@ -72,6 +72,27 @@ export default function User() {
         <p>Your Longitude is: {formData.location.lng}</p>
         <p>Your Latitude is: {formData.location.lat}</p>
       </div>
+      <div>
+        <p>Pci upload ke liye</p>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) =>
+            setFormData({ ...formData, picture: e.target.files[0] })
+          }
+          capture="environment"
+        />
+        {formData.picture && (
+        <div>
+          <p>Preview:</p>
+          <img
+            src={URL.createObjectURL(formData.picture)}
+            alt="preview"
+            style={{ width: "200px", height: "200px", objectFit: "cover" }}
+          />
+        </div>
+      )}
+      </div>
       <button onClick={getLocation}>Click to get Your Location</button>
       <button onClick={() => console.log(formData)}>Submit</button>
       <LoadScript googleMapsApiKey={API_KEY}>
@@ -83,7 +104,6 @@ export default function User() {
         >
           <Marker position={formData.location} />
         </GoogleMap>
-
       </LoadScript>
     </>
   );
