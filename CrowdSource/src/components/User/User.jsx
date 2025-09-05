@@ -105,6 +105,11 @@ export default function User() {
           <Marker position={formData.location} />
         </GoogleMap>
       </LoadScript>
+      {/* for debug */}
+      {error&&(
+        <p>Error is: {error}</p>
+      )}
+      
     </>
   );
 }
