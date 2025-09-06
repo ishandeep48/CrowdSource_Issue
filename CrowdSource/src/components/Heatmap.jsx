@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import issues from "../data/issues.js";
 import indiaGeoJson from "../data/india.json";
+import indiaDistrictsGeoJson from "../data/district.json";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
@@ -77,17 +78,35 @@ export default function User() {
     return { name: stateName, count };
   });
 
-  const maxCount = Math.max(...stateIssueCounts.map((s) => s.count)) || 1;
+  const districtIssueCounts = indiaDistrictsGeoJson.features.map((district) => {
+  const districtName = district.properties.dtname;
+  let count = 0;
+  issues.forEach((issue) => {
+    if (pointInPolygon({ lat: issue.lat, lng: issue.lng }, district.geometry)) count++;
+  });
+  return { name: districtName, count };
+});
+
+  const maxStateCount = Math.max(...stateIssueCounts.map((s) => s.count)) || 1;
+  const maxDistrictCount = Math.max(...districtIssueCounts.map((d) => d.count)) || 1;
+
 
   useEffect(() => {
-    if (!map) return;
+  if (!map) return;
 
+  // Clear old features
+  map.data.forEach(f => map.data.remove(f));
+
+  if (zoom < 7) {
+    // Add states
     map.data.addGeoJson(indiaGeoJson);
+
     map.data.setStyle((feature) => {
       const stateName = feature.getProperty("STNAME");
       const stateData = stateIssueCounts.find((s) => s.name === stateName);
       const count = stateData ? stateData.count : 0;
-      const ratio = count / maxCount;
+      const ratio = count / maxStateCount;
+
       return {
         fillColor: getColor(ratio, count),
         fillOpacity: 0.5,
@@ -96,7 +115,27 @@ export default function User() {
         strokeWeight: 1,
       };
     });
-  }, [map, stateIssueCounts, maxCount]);
+  } else {
+    // Add districts
+    map.data.addGeoJson(indiaDistrictsGeoJson);
+
+    map.data.setStyle((feature) => {
+      const districtName = feature.getProperty("dtname");
+      const districtData = districtIssueCounts.find((d) => d.name === districtName);
+      const count = districtData ? districtData.count : 0;
+      const ratio = count / maxDistrictCount;
+
+      return {
+        fillColor: getColor(ratio, count),
+        fillOpacity: 0.7,
+        strokeColor: "#000",
+        strokeOpacity: 0.3,
+        strokeWeight: 2,
+      };
+    });
+  }
+}, [map, zoom, stateIssueCounts, districtIssueCounts, maxStateCount, maxDistrictCount]);
+
 
   const mapClickHandler = (e) => {
     const lat = e.latLng.lat();
@@ -135,42 +174,20 @@ export default function User() {
 
           {/* InfoWindow */}
           {selectedIssue && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50px", // adjust based on your map container
-                left: "50px",
-                background: "white",
-                color: "black",
-                padding: "15px",
-                borderRadius: "8px",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                zIndex: 1000,
-                maxWidth: "250px",
-              }}
-            >
-              <button
-                onClick={() => setSelectedIssue(null)}
-                style={{
-                  position: "absolute",
-                  top: "2px",
-                  left: "14rem",
-                  background: "transparent",
-                  border: "none",
-                  fontSize: "16px",
-                  cursor: "pointer",
-                  color: "black",
-                }}
-              >
-                <i className="fa-solid fa-xmark"></i>
-              </button>
-              <h3>{selectedIssue.title}</h3>
-              <p><b>Category:</b> {selectedIssue.category}</p>
-              <p><b>Description:</b> {selectedIssue.description}</p>
-              <p><b>Reported By:</b> {selectedIssue.reportedBy}</p>
-              <p><b>Date:</b> {selectedIssue.date}</p>
-            </div>
-          )}
+  <InfoWindow
+    position={{ lat: selectedIssue.lat, lng: selectedIssue.lng }}
+    onCloseClick={() => setSelectedIssue(null)}
+  >
+    <div style={{ color: "black" }}>
+      <h3>{selectedIssue.title}</h3>
+      <p><b>Category:</b> {selectedIssue.category}</p>
+      <p><b>Description:</b> {selectedIssue.description}</p>
+      <p><b>Reported By:</b> {selectedIssue.reportedBy}</p>
+      <p><b>Date:</b> {selectedIssue.date}</p>
+    </div>
+  </InfoWindow>
+)}
+
 
         </GoogleMap>
       </LoadScript>
