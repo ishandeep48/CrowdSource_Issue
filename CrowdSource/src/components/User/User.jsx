@@ -60,7 +60,8 @@ export default function User() {
     });
   };
   // to send to backend
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     // console.log(formData);
     // console.log(pic)
     const sendForm = new FormData();
@@ -92,13 +93,14 @@ export default function User() {
   };
   return (
     <>
+    <form onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="Your Issue"
         value={formData.issue}
         onChange={(e) => setFormData({ ...formData, issue: e.target.value })}
+        required
       />
-
       <select
         name="priority"
         value={formData.priority}
@@ -119,6 +121,7 @@ export default function User() {
           accept="image/*"
           onChange={(e) => setPic(e.target.files[0])}
           capture="environment"
+          required
         />
         {pic && (
           <div>
@@ -132,7 +135,9 @@ export default function User() {
         )}
       </div>
       {/* <button onClick={getLocation}>Click to get Your Location</button> */}
-      <button onClick={handleSubmit}>Submit</button>
+      {/* <button onClick={handleSubmit}>Submit</button> */}
+      <button type="submit">Submit</button>
+      </form>
       <LoadScript googleMapsApiKey={API_KEY}>
         <GoogleMap
           mapContainerStyle={containerStyle}

@@ -14,17 +14,21 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
   try {
     const data = JSON.parse(req.body.data);
     const ext = req.file.originalname.split(".").pop();
+    // store the pic in a temporary location
     tempPic = path.join(
       process.cwd(),
       "issueImages",
       "issue-" + Date.now() + `.${ext}`
     );
     fs.writeFileSync(tempPic, req.file.buffer);
+    //upload to a folder in cloudinary CrowdIssues
     const result = await cloudinary.uploader.upload(tempPic, {
       folder: "CrowdIssues",
       resource_type: "image",
     });
 
+    // currently stores like this will be changed when I add Authentication
+    // TODO
     const issueData = {
       ID: randomID(),
       location: data.location,
@@ -42,12 +46,14 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
     });
   } catch (err) {
     console.log(err);
+    // May send some error stuff
     return res.status(500).json({
       success: false,
     });
   } finally {
     try {
-      console.log(tempPic);
+        //delete the temporary fileu saved
+    //   console.log(tempPic);
       if (fs.existsSync(tempPic)) {
         fs.unlinkSync(tempPic);
         console.log("Temp file deleted:", tempPic);
