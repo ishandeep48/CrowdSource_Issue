@@ -2,23 +2,23 @@ import mongoose from "mongoose";
 
 const issueSchema = new mongoose.Schema({
   ID: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },
   reportedAt: {
     type: Date,
-    required: true,
+    // required: true,
     default:Date.now()
   },
   reportedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    // required: true,
   },
   status:{
     type:String,
-    required:true,
+    // required:true,
     enum:["reported","reviewed","forwarded","resolved","cancelled"],
     default:"reported"
   },
@@ -47,7 +47,7 @@ const issueSchema = new mongoose.Schema({
     type:String,
     // commented the below cause there will be tests as this is in development rn
     // required:true,
-    // unique:true
+    unique:true
   },
   department:{
     type:String,
