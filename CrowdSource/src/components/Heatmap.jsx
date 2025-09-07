@@ -20,7 +20,7 @@ const circleOptions = {
 };
 
 function getCircleRadius(zoom) {
-  const baseRadius = 60000; // big at zoom=7 (~800km)
+  const baseRadius = 60000;
   const scale = Math.pow(2, 7 - zoom);
   return baseRadius * scale;
 }
@@ -101,7 +101,6 @@ export default function User() {
   useEffect(() => {
     if (!map) return;
 
-    // Clear old features
     map.data.forEach((f) => map.data.remove(f));
 
     if (zoom < 7) {
@@ -147,36 +146,35 @@ export default function User() {
         >
           {/* Circles shrink dynamically between zoom 7 → 8 */}
           {issues.map((issue, idx) => {
-  let circleRadius = 0;
-  let circleOpacity = 0;
+            let circleRadius = 0;
+            let circleOpacity = 0;
 
-  if (zoom >= 7 && zoom < 8) {
-    // Shrinking circles between zoom 7 → 8
-    const factor = 8 - zoom; // 1 → 0
-    circleRadius = getCircleRadius(7) * factor;
-    circleOpacity = factor;
-  } else if (zoom >= 8) {
-    // Circles stay small but visible under markers
-    circleRadius = 20000; // small static radius
-    circleOpacity = 0.8; // slightly transparent
-  }
+            if (zoom >= 7 && zoom < 8) {
 
-  return (
-    <Circle
-      key={`circle-${idx}`}
-      center={{ lat: issue.lat, lng: issue.lng }}
-      radius={circleRadius}
-      options={{
-        ...circleOptions,
-        fillOpacity: circleOpacity * 0.6,
-        strokeOpacity: circleOpacity * 0.8,
-      }}
-    />
-  );
-})}
+              const factor = 8 - zoom; 
+              circleRadius = getCircleRadius(7) * factor;
+              circleOpacity = factor;
+            } else if (zoom >= 8) {
+
+              circleRadius = 20000; 
+              circleOpacity = 0.8;
+            }
+
+            return (
+              <Circle
+                key={`circle-${idx}`}
+                center={{ lat: issue.lat, lng: issue.lng }}
+                radius={circleRadius}
+                options={{
+                  ...circleOptions,
+                  fillOpacity: circleOpacity * 0.6,
+                  strokeOpacity: circleOpacity * 0.8,
+                }}
+              />
+            );
+          })}
 
 
-          {/* Markers appear only when circles are gone (zoom >= 8) */}
           {zoom >= 8 &&
             issues.map((issue, idx) => (
               <Marker
@@ -189,7 +187,7 @@ export default function User() {
               />
             ))}
 
-          {/* InfoWindow */}
+
           {selectedIssue && (
             <InfoWindow
               position={{ lat: selectedIssue.lat, lng: selectedIssue.lng }}
