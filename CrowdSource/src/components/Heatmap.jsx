@@ -1,13 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, Circle, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import issues from "../data/issues.js";
 import indiaGeoJson from "../data/india.json";
-import indiaDistrictsGeoJson from "../data/district.json";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
 
 const containerStyle = { width: "500px", height: "500px" };
 const indiaCenter = { lat: 20.5937, lng: 78.9629 };
+
+const circleOptions = {
+  strokeColor: "#FF0000",
+  strokeOpacity: 0.8,
+  strokeWeight: 1,
+  fillColor: "#FF0000",
+  fillOpacity: 0.35,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  zIndex: 1,
+};
+
+function getCircleRadius(zoom) {
+  const baseRadius = 60000; // big at zoom=7 (~800km)
+  const scale = Math.pow(2, 7 - zoom);
+  return baseRadius * scale;
+}
 
 function pointInPolygon(point, polygon) {
   const [x, y] = [point.lng, point.lat];
@@ -19,7 +35,9 @@ function pointInPolygon(point, polygon) {
       for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
         const xi = ring[i][0], yi = ring[i][1];
         const xj = ring[j][0], yj = ring[j][1];
-        const intersect = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi);
+        const intersect =
+          (yi > y) !== (yj > y) &&
+          x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
         if (intersect) inside = !inside;
       }
     }
@@ -78,64 +96,33 @@ export default function User() {
     return { name: stateName, count };
   });
 
-  const districtIssueCounts = indiaDistrictsGeoJson.features.map((district) => {
-  const districtName = district.properties.dtname;
-  let count = 0;
-  issues.forEach((issue) => {
-    if (pointInPolygon({ lat: issue.lat, lng: issue.lng }, district.geometry)) count++;
-  });
-  return { name: districtName, count };
-});
-
   const maxStateCount = Math.max(...stateIssueCounts.map((s) => s.count)) || 1;
-  const maxDistrictCount = Math.max(...districtIssueCounts.map((d) => d.count)) || 1;
-
 
   useEffect(() => {
-  if (!map) return;
+    if (!map) return;
 
-  // Clear old features
-  map.data.forEach(f => map.data.remove(f));
+    // Clear old features
+    map.data.forEach((f) => map.data.remove(f));
 
-  if (zoom < 7) {
-    // Add states
-    map.data.addGeoJson(indiaGeoJson);
+    if (zoom < 7) {
+      map.data.addGeoJson(indiaGeoJson);
 
-    map.data.setStyle((feature) => {
-      const stateName = feature.getProperty("STNAME");
-      const stateData = stateIssueCounts.find((s) => s.name === stateName);
-      const count = stateData ? stateData.count : 0;
-      const ratio = count / maxStateCount;
+      map.data.setStyle((feature) => {
+        const stateName = feature.getProperty("STNAME");
+        const stateData = stateIssueCounts.find((s) => s.name === stateName);
+        const count = stateData ? stateData.count : 0;
+        const ratio = count / maxStateCount;
 
-      return {
-        fillColor: getColor(ratio, count),
-        fillOpacity: 0.5,
-        strokeColor: "#222",
-        strokeOpacity: 0.3,
-        strokeWeight: 1,
-      };
-    });
-  } else {
-    // Add districts
-    map.data.addGeoJson(indiaDistrictsGeoJson);
-
-    map.data.setStyle((feature) => {
-      const districtName = feature.getProperty("dtname");
-      const districtData = districtIssueCounts.find((d) => d.name === districtName);
-      const count = districtData ? districtData.count : 0;
-      const ratio = count / maxDistrictCount;
-
-      return {
-        fillColor: getColor(ratio, count),
-        fillOpacity: 0.7,
-        strokeColor: "#000",
-        strokeOpacity: 0.3,
-        strokeWeight: 2,
-      };
-    });
-  }
-}, [map, zoom, stateIssueCounts, districtIssueCounts, maxStateCount, maxDistrictCount]);
-
+        return {
+          fillColor: getColor(ratio, count),
+          fillOpacity: 0.5,
+          strokeColor: "#222",
+          strokeOpacity: 0.3,
+          strokeWeight: 1,
+        };
+      });
+    }
+  }, [map, zoom, stateIssueCounts, maxStateCount]);
 
   const mapClickHandler = (e) => {
     const lat = e.latLng.lat();
@@ -158,8 +145,38 @@ export default function User() {
           onClick={mapClickHandler}
           onZoomChanged={handleZoomChanged}
         >
+          {/* Circles shrink dynamically between zoom 7 → 8 */}
+          {issues.map((issue, idx) => {
+  let circleRadius = 0;
+  let circleOpacity = 0;
 
-          {/* Issue markers only if zoom >= 8 */}
+  if (zoom >= 7 && zoom < 8) {
+    // Shrinking circles between zoom 7 → 8
+    const factor = 8 - zoom; // 1 → 0
+    circleRadius = getCircleRadius(7) * factor;
+    circleOpacity = factor;
+  } else if (zoom >= 8) {
+    // Circles stay small but visible under markers
+    circleRadius = 20000; // small static radius
+    circleOpacity = 0.8; // slightly transparent
+  }
+
+  return (
+    <Circle
+      key={`circle-${idx}`}
+      center={{ lat: issue.lat, lng: issue.lng }}
+      radius={circleRadius}
+      options={{
+        ...circleOptions,
+        fillOpacity: circleOpacity * 0.6,
+        strokeOpacity: circleOpacity * 0.8,
+      }}
+    />
+  );
+})}
+
+
+          {/* Markers appear only when circles are gone (zoom >= 8) */}
           {zoom >= 8 &&
             issues.map((issue, idx) => (
               <Marker
@@ -174,21 +191,19 @@ export default function User() {
 
           {/* InfoWindow */}
           {selectedIssue && (
-  <InfoWindow
-    position={{ lat: selectedIssue.lat, lng: selectedIssue.lng }}
-    onCloseClick={() => setSelectedIssue(null)}
-  >
-    <div style={{ color: "black" }}>
-      <h3>{selectedIssue.title}</h3>
-      <p><b>Category:</b> {selectedIssue.category}</p>
-      <p><b>Description:</b> {selectedIssue.description}</p>
-      <p><b>Reported By:</b> {selectedIssue.reportedBy}</p>
-      <p><b>Date:</b> {selectedIssue.date}</p>
-    </div>
-  </InfoWindow>
-)}
-
-
+            <InfoWindow
+              position={{ lat: selectedIssue.lat, lng: selectedIssue.lng }}
+              onCloseClick={() => setSelectedIssue(null)}
+            >
+              <div style={{ color: "black" }}>
+                <h3>{selectedIssue.title}</h3>
+                <p><b>Category:</b> {selectedIssue.category}</p>
+                <p><b>Description:</b> {selectedIssue.description}</p>
+                <p><b>Reported By:</b> {selectedIssue.reportedBy}</p>
+                <p><b>Date:</b> {selectedIssue.date}</p>
+              </div>
+            </InfoWindow>
+          )}
         </GoogleMap>
       </LoadScript>
 
