@@ -1,9 +1,16 @@
 import React, { useMemo, useState, useRef } from "react";
-import { GoogleMap, LoadScript, HeatmapLayer, Marker } from "@react-google-maps/api";
-import issues from "../../data/issues.js";
-
+import {
+  GoogleMap,
+  LoadScript,
+  HeatmapLayer,
+  Marker,
+} from "@react-google-maps/api";
+// import issues from "../../data/issues.js";
+import { useCallback,useEffect } from "react";
+import axios from "axios";
 const containerStyle = { width: "600px", height: "600px" };
 const indiaCenter = { lat: 20.5937, lng: 78.9629 };
+// const initialOpacity = 0.7;
 
 export default function User() {
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -11,26 +18,51 @@ export default function User() {
   const [zoom, setZoom] = useState(5);
   const mapRef = useRef(null);
   const heatmapRef = useRef(null);
-
+  const [issues,setIssues] = useState(null)
   const heatmapData = useMemo(() => {
-    if (!mapLoaded || !window.google) return [];
-    return issues.map((issue) => new window.google.maps.LatLng(issue.lat, issue.lng));
-  }, [mapLoaded]);
+    if (!mapLoaded || !window.google || !issues) return [];
+    return issues.map(
+      (issue) => new window.google.maps.LatLng(issue.location.lat, issue.location.lng)
+    );
+  }, [mapLoaded,issues]);
+
+  useEffect(()=>{
+    const getIssue = async() =>{
+      const response =await axios.get('http://localhost/allissues');
+    let data;
+    if(response.status==200){
+      data = response.data;
+    }
+    setIssues(data.issues)
+    }
+    getIssue()
+    
+    // console.log(data)
+  },[])
 
   const handleZoomChanged = () => {
     if (!mapRef.current) return;
     const currentZoom = mapRef.current.getZoom();
     setZoom(currentZoom);
 
-    // Manually remove heatmap when zoom >= 11
-    if (currentZoom >= 11 && heatmapRef.current) {
-      heatmapRef.current.setMap(null);
-    }
-    // Optionally show heatmap again when zoom < 11
-    if (currentZoom < 11 && heatmapRef.current) {
-      heatmapRef.current.setMap(mapRef.current);
-    }
+    // not working
+    //   if (currentZoom >= 11) {
+    //   heatmapRef.current.setMap(null);
+    // } else {
+    //   heatmapRef.current.setMap(mapRef.current);
+    // }
   };
+
+  const markers = useMemo(() => {
+    if (!issues) return [];
+    return issues.map((issue) => (
+      <Marker
+        key={issue.id}
+        position={{ lat: issue.location.lat, lng: issue.location.lng }}
+        title={issue.title}
+      />
+    ));
+  }, [issues]);
 
   return (
     <LoadScript googleMapsApiKey={API_KEY} libraries={["visualization"]}>
@@ -42,13 +74,12 @@ export default function User() {
           mapRef.current = map;
           setMapLoaded(true);
         }}
-        onZoomChanged={handleZoomChanged}
+        onIdle={handleZoomChanged}
       >
         {mapLoaded && (
           <HeatmapLayer
             onLoad={(heatmap) => {
               heatmapRef.current = heatmap;
-              heatmap.setMap(mapRef.current);
             }}
             data={heatmapData}
             options={{
@@ -59,15 +90,7 @@ export default function User() {
           />
         )}
 
-        {mapLoaded &&
-          zoom >= 11 &&
-          issues.map((issue) => (
-            <Marker
-              key={issue.id}
-              position={{ lat: issue.lat, lng: issue.lng }}
-              title={issue.title}
-            />
-          ))}
+        {mapLoaded && zoom >= 11 && markers}
       </GoogleMap>
     </LoadScript>
   );
