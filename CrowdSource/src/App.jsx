@@ -1,16 +1,13 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 import './App.css'
-import User from  './components/User/User'
-import Heatmap from './components/Admin/Heatmap';
+import Home from './pages/Home'
 
 export default function App() {
 return(
-  <Router>
     <Routes>
-      <Route path="/" element={<User />} />
-      <Route path="/heatmap" element={<Heatmap />} />
+      <Route path="/" element={<Home />} />
     </Routes>
-  </Router>
 )
 }
 
