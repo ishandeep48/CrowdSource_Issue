@@ -5,11 +5,16 @@ import path from "path";
 import cloudinary from "../Middleware/cloudinary.js";
 import Issue from "../Models/IssueModel.js";
 import { randomID } from "../functions/helper.js";
+import { Client } from "@gradio/client";
+import dotenv from "dotenv";
+dotenv.config();
 
 const router = express.Router();
 const upload = multer();
 
 router.post("/submitissue", upload.single("pic"), async (req, res) => {
+  const APIURL = process.env.AI_ENDPOINT;
+  // console.log(APIURL)
   let tempPic = "";
   try {
     const data = JSON.parse(req.body.data);
@@ -29,12 +34,19 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
 
     // currently stores like this will be changed when I add Authentication
     // TODO
+    const client = await Client.connect(APIURL);
+    const API_result = await client.predict("/predict", {
+      text: data.issue,
+    });
+    const API_data = API_result.data[0];
+    console.log(API_data);
     const issueData = {
       ID: randomID(),
       location: data.location,
-      priority: data.priority,
+      priority: API_data.Priority.toLowerCase(),
       imgURL: result.secure_url,
-      description: data.issue,
+      description: API_data.Complaint,
+      department: API_data['Predicted Category'], // may change based on the API Update
     };
     const newIssue = new Issue(issueData);
     await newIssue.save();
@@ -52,8 +64,8 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
     });
   } finally {
     try {
-        //delete the temporary fileu saved
-    //   console.log(tempPic);
+      //delete the temporary fileu saved
+      //   console.log(tempPic);
       if (fs.existsSync(tempPic)) {
         fs.unlinkSync(tempPic);
         console.log("Temp file deleted:", tempPic);

@@ -19,5 +19,8 @@
     "multer": "^2.0.2",
     "nanoid": "^5.1.5",
     "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@gradio/client": "^1.18.0"
   }
 }
