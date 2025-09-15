@@ -46,7 +46,7 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
       priority: API_data.Priority.toLowerCase(),
       imgURL: result.secure_url,
       description: API_data.Complaint,
-      department: API_data['Predicted Category'], // may change based on the API Update
+      department: API_data.Predicted_Category, // may change based on the API Update
     };
     const newIssue = new Issue(issueData);
     await newIssue.save();
