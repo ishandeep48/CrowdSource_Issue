@@ -1,18 +1,41 @@
 import React, { useState } from "react";
 import icon from "../assets/loginicon.png";
+import axios from "axios";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Citizen");
 
-  const handleSignup = () => {
-    alert(`Pressed! Role: ${role}`);
+  const handleSignup = async() => {
+    // alert(`Pressed! Role: ${role}`);
     console.log({
       role,
       email,
       password,
     });
+    const toSend = {
+      email,password,role
+    }
+    try{
+      const postTo = (role=='Citizen') ? 'http://localhost/user/login' : 'http://localhost/admin/login'
+      const result = await axios.post(postTo,toSend,{
+        withCredentials: true // check the signup page line 41
+      })
+      const response = result.data;
+      // console.log(response)
+      if(response.message){
+        //Login Success replace with the navigation or any other logic
+        alert("Logged IN")
+      }else{
+        //Failure show some error based on what response you get
+        alert('cloudnt login')
+      }
+
+    }catch(err){
+      alert('smth went wrong')
+      //make some handling logic
+    }
   };
 
   return (

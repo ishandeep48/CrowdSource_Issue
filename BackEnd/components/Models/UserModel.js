@@ -5,20 +5,29 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    username:{
+    password:{
         type:String,
         required:true,
-        unique:true
+        // unique:true
     },
     email:{
         type:String,
         required:true,
-        unique:true
+        // unique:true
     },
-    phNO:{
+    phone:{
         type:String,
-        unique:true
+        // unique:true
     },
+    aadhaar:{
+        type:String,
+        required:true,
+    },
+    role:{
+        type:String,
+        enum:['user'],
+        default:'user'
+    }
     //ADD MORE KEYS HERE FOR MORE DATA LATER
 })
 
