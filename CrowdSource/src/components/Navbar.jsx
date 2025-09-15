@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   return (
     <header className="w-full bg-white">
       <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6 lg:px-8">
@@ -12,13 +14,13 @@ export default function Navbar() {
         <div className="flex items-center gap-3 lg:gap-5">
           <button
             className="bg-[#1E5EFF] text-white text-sm lg:text-lg font-semibold py-2 px-4 lg:px-8 rounded-lg hover:bg-[#164bcc] transition-colors duration-200"
-            onClick={() => alert("Sign in pressed!")}
+            onClick={() => navigate("/signin")}
           >
             Sign in
           </button>
           <button
             className="bg-transparent border-2 border-[#1E5EFF] text-black text-sm lg:text-lg font-semibold py-2 px-4 lg:px-8 rounded-lg hover:bg-[#f0f4ff] transition-colors duration-200"
-            onClick={() => alert("Sign up pressed!")}
+            onClick={() => navigate("/signup")}
           >
             Sign up
           </button>

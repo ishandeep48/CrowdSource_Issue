@@ -1,8 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Illustrationsection from "../components/Illustrationsection";
 
+
 export default function Home() {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col bg-white min-h-screen">
       <Navbar />
@@ -28,7 +31,9 @@ export default function Home() {
           <button className="bg-[#1E5EFF] text-white font-bold rounded-lg hover:bg-[#164bcc] transition-colors duration-200 shadow-lg w-full sm:w-auto max-w-xs sm:max-w-none" style={{
             padding: 'clamp(0.75rem, 2vw, 1.25rem) clamp(1.5rem, 4vw, 2.5rem)',
             fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'
-          }}>
+            
+          }}
+          onClick={() => navigate("/signup")}>
             Get Started
           </button>
         </div>
