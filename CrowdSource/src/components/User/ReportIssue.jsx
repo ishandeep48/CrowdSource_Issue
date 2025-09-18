@@ -1,0 +1,317 @@
+import { useState, useRef, useLayoutEffect } from "react";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import NavbarUser from "./NavbarUser";
+
+export default function ReportIssue() {
+  const navigate = useNavigate();
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  let priorityOptions = ["low", "medium", "high", "critical"];
+  const formDataStruct = {
+    issue: "",
+    priority: priorityOptions[0],
+    location: {
+      lat: 0,
+      lng: 0,
+    },
+  };
+  const [formData, setFormData] = useState(formDataStruct);
+  const [error, setError] = useState(null);
+  const [pic, setPic] = useState(null);
+  const [resID, setResID] = useState(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  //gets current location
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFormData({
+          ...formData,
+          location: {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          },
+        });
+      },
+      (err) => {
+        setError(err.message);
+        // Set a default location if geolocation fails
+        setFormData({
+          ...formData,
+          location: {
+            lat: 40.7128,
+            lng: -74.0060,
+          },
+        });
+      }
+    );
+  };
+  
+  useLayoutEffect(() => {
+    getLocation();
+  }, []);
+  
+  const containerStyle = {
+    width: "100%",
+    height: "400px",
+  };
+  
+  // changes the location
+  const mapClickHandler = (e) => {
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+    setFormData({
+      ...formData,
+      location: {
+        lat: lat,
+        lng: lng,
+      },
+    });
+  };
+  
+  // to send to backend
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const sendForm = new FormData();
+    sendForm.append("pic", pic);
+    sendForm.append("data", JSON.stringify(formData));
+    try {
+      const res = await axios.post("http://localhost/submitissue", sendForm, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const data = res.data;
+      if (data.success) {
+        setResID(data.issueID);
+        setFormData(formDataStruct);
+        setPic(null);
+        // Navigate back to user dashboard after successful submission
+        setTimeout(() => {
+          navigate("/user");
+        }, 2000);
+      } else {
+        setResID("Couldn't save to database, try to send again");
+      }
+    } catch (err) {
+      console.log(err);
+      setError(err);
+    }
+  };
+
+  // Fix for Google Maps display issues
+  const handleMapLoad = () => {
+    setMapLoaded(true);
+    // Ensure the map is properly sized after loading
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 300);
+  };
+
+  return (
+    <>
+      <div className="flex flex-col bg-white min-h-screen">
+        <NavbarUser />
+        
+        {/* Back button */}
+         <div className="container mx-auto px-4 py-6">
+          <div className="max-w-4xl mx-auto">
+            <button 
+              onClick={() => navigate("/user")}
+              className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+              </svg>
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+
+        {/* Report Issue Form */}
+        <div className="container mx-auto px-4 py-6 max-w-4xl">
+          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">Report an Issue</h1>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Issue Description */}
+              <div>
+                <label htmlFor="issue" className="block text-lg font-semibold text-gray-800 mb-2">
+                  Issue Description
+                </label>
+                <textarea
+                  id="issue"
+                  placeholder="Describe the issue in detail..."
+                  value={formData.issue}
+                  onChange={(e) => setFormData({ ...formData, issue: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows="4"
+                  required
+                />
+              </div>
+              
+              {/* Priority Level */}
+              <div>
+                <label htmlFor="priority" className="block text-lg font-semibold text-gray-800 mb-2">
+                  Priority Level
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {priorityOptions.map((option) => (
+                    <div 
+                      key={option}
+                      className={`p-3 border rounded-lg cursor-pointer text-center transition-all ${
+                        formData.priority === option 
+                          ? option === 'critical' ? 'bg-red-100 border-red-500 text-red-700' 
+                            : option === 'high' ? 'bg-orange-100 border-orange-500 text-orange-700'
+                            : option === 'medium' ? 'bg-yellow-100 border-yellow-500 text-yellow-700'
+                            : 'bg-green-100 border-green-500 text-green-700'
+                          : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+                      }`}
+                      onClick={() => setFormData({ ...formData, priority: option })}
+                    >
+                      <span className="font-medium">{option.toUpperCase()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Location */}
+              <div>
+                <label className="block text-lg font-semibold text-gray-800 mb-2">
+                  Location
+                </label>
+                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-700">Longitude:</span>
+                      <p className="text-blue-700 font-mono">{formData.location.lng.toFixed(6)}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Latitude:</span>
+                      <p className="text-blue-700 font-mono">{formData.location.lat.toFixed(6)}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-2">Click on the map to change location</p>
+                </div>
+                
+                <div className="border rounded-lg overflow-hidden shadow-md mb-4" style={{ height: "400px" }}>
+                  <LoadScript googleMapsApiKey={API_KEY}>
+                    <GoogleMap
+                      mapContainerStyle={containerStyle}
+                      center={formData.location}
+                      zoom={15}
+                      onClick={mapClickHandler}
+                      onLoad={handleMapLoad}
+                      options={{
+                        streetViewControl: false,
+                        mapTypeControl: false,
+                        fullscreenControl: false,
+                      }}
+                    >
+                      <Marker position={formData.location} />
+                    </GoogleMap>
+                  </LoadScript>
+                </div>
+              </div>
+              
+              {/* Picture Upload */}
+              <div>
+                <label htmlFor="picture" className="block text-lg font-semibold text-gray-800 mb-2">
+                  Upload Picture
+                </label>
+                <div className="flex items-center justify-center w-full">
+                  <label htmlFor="picture" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-sm text-gray-500">
+                        {pic ? "Change image" : "Click to upload or drag and drop"}
+                      </p>
+                    </div>
+                    <input 
+                      id="picture" 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => setPic(e.target.files[0])} 
+                      capture="environment" 
+                      className="hidden" 
+                      required 
+                    />
+                  </label>
+                </div>
+                
+                {pic && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                    <div className="relative inline-block">
+                      <img
+                        src={URL.createObjectURL(pic)}
+                        alt="preview"
+                        className="w-40 h-40 object-cover rounded-lg border shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPic(null)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Buttons */}
+              <div className="flex justify-between space-x-4 pt-6 border-t">
+                <button
+                  type="button"
+                  onClick={() => navigate("/user")}
+                  className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors shadow-md"
+                >
+                  Submit Issue
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        {/* Display messages */}
+        {error && (
+          <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg max-w-sm">
+            <div className="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p>Error: {error}</p>
+            </div>
+          </div>
+        )}
+        
+        {resID && (
+          <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg max-w-sm">
+            <div className="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p>Issue reported successfully! ID: {resID}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

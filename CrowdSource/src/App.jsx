@@ -6,6 +6,7 @@ import Admin from './components/Admin/Heatmap'
 import User from './components/User/User'
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
+import ReportIssue from "./components/User/ReportIssue";
 
 export default function App() {
 return(
@@ -15,6 +16,7 @@ return(
       <Route path="/user" element={<User/>}/>
       <Route path="/signup" element={<Signup />}/>
       <Route path="/signin" element={<Signin />}/>
+      <Route path="/report-issue" element = { <ReportIssue />}/>
     </Routes>
 )
 }
