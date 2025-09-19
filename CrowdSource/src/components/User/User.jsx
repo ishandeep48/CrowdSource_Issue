@@ -99,7 +99,7 @@ export default function User() {
   };
   return (
     <>
-    <div className="flex flex-col bg-white min-h-screen">
+    <div className="min-h-screen bg-gray-100">
     <NavbarUser />
     <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
         <div className="text-center max-w-5xl mx-auto w-full">
