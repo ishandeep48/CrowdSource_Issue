@@ -24,33 +24,33 @@ export default function ReportIssue() {
 
   //gets current location
   const getLocation = () => {
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
-      return;
+  if (!navigator.geolocation) {
+    setError("Geolocation is not supported by your browser");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      setFormData(prev => ({
+        ...prev,
+        location: {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        },
+      }));
+    },
+    (err) => {
+      setError(err.message);
+      setFormData(prev => ({
+        ...prev,
+        location: {
+          lat: 40.7128,
+          lng: -74.0060,
+        },
+      }));
     }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setFormData({
-          ...formData,
-          location: {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          },
-        });
-      },
-      (err) => {
-        setError(err.message);
-        // Set a default location if geolocation fails
-        setFormData({
-          ...formData,
-          location: {
-            lat: 40.7128,
-            lng: -74.0060,
-          },
-        });
-      }
-    );
-  };
+  );
+};
+
   
   useLayoutEffect(() => {
     getLocation();
@@ -90,11 +90,15 @@ export default function ReportIssue() {
       if (data.success) {
         setResID(data.issueID);
         setFormData(formDataStruct);
+        console.log('form data set to default')
+        
         setPic(null);
+        setError(null);
+        getLocation();
         // Navigate back to user dashboard after successful submission
-        setTimeout(() => {
-          navigate("/user");
-        }, 2000);
+        // setTimeout(() => {
+        //   navigate("/user");
+        // }, 2000);
       } else {
         setResID("Couldn't save to database, try to send again");
       }

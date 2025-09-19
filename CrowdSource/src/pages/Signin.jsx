@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import icon from "../assets/loginicon.png";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Citizen");
-
+  const navigate = useNavigate();
   const handleSignup = async() => {
     // alert(`Pressed! Role: ${role}`);
     console.log({
@@ -23,10 +24,17 @@ export default function Signin() {
         withCredentials: true // check the signup page line 41
       })
       const response = result.data;
+      console.log(response)
       // console.log(response)
       if(response.message){
         //Login Success replace with the navigation or any other logic
-        alert("Logged IN")
+        localStorage.setItem('userDetail',JSON.stringify(response.user))
+        const userType = response.user.role;
+        if(userType=='user'){
+          navigate('/user')
+        }else if ( userType == 'admin'){
+          navigate('/')
+        }
       }else{
         //Failure show some error based on what response you get
         alert('cloudnt login')

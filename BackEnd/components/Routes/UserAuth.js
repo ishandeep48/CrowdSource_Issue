@@ -94,7 +94,12 @@ router.post("/user/login", async (req, res) => {
       sameSite: "strict",
       maxAge: 20 * 24 * 60 * 60 * 1000,
     });
-    res.status(200).json({ message: true });
+    res.status(200).json({ message: true , user:{
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    }});
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: false , error:"Server Error"});

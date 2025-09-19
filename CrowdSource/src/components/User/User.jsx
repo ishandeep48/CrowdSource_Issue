@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function User() {
   const navigate = useNavigate();
-  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  // const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   let priorityOptions = ["low", "medium", "high", "critical"];
   const formDataStruct = {
     issue: "",
@@ -20,10 +20,10 @@ export default function User() {
     },
   };
   const [formData, setFormData] = useState(formDataStruct);
-  const [error, setError] = useState(null);
-  const [pic, setPic] = useState(null);
-  const [resID, setResID] = useState(null);
- 
+  // const [error, setError] = useState(null);
+  // const [pic, setPic] = useState(null);
+  // const [resID, setResID] = useState(null);
+  const [userData ,setUserData] = useState({})
   //gets current location
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -47,56 +47,69 @@ export default function User() {
   };
   useLayoutEffect(() => {
     getLocation();
-  }, []);
-  const containerStyle = {
-    width: "700x",
-    height: "450px",
-  };
-  // changes the location
-  const mapClickHandler = (e) => {
-    const lat = e.latLng.lat();
-    const lng = e.latLng.lng();
-    setFormData({
-      ...formData,
-      location: {
-        lat: lat,
-        lng: lng,
-      },
-    });
-  };
-  // to send to backend
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    // console.log(formData);
-    // console.log(pic)
-    const sendForm = new FormData();
-    sendForm.append("pic", pic);
-    sendForm.append("data", JSON.stringify(formData));
+     const storedUser = localStorage.getItem('userDetail');
+  if (storedUser) {
     try {
-      const res = await axios.post("http://localhost/submitissue", sendForm, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const data = res.data;
-      if (data.success) {
-        setResID(data.issueID);
-        setFormData({
-          issue: "",
-          priority: priorityOptions[0],
-          // picture: "",
-        });
-        setPic(null);
-        setShowReportModal(false);
-      } else {
-        setResID("Couldnt save to database try to send again");
-      }
-      // console.log(data)
+      const parsedUser = JSON.parse(storedUser);
+      // console.log(parsedUser);
+      setUserData(parsedUser);
     } catch (err) {
-      console.log(err);
-      setError(err);
+      console.error("Failed to parse user data:", err);
+      setUserData({});
     }
-  };
+  } else {
+    setUserData({});
+  }
+  }, []);
+  // const containerStyle = {
+  //   width: "700x",
+  //   height: "450px",
+  // };
+  // changes the location
+  // const mapClickHandler = (e) => {
+  //   const lat = e.latLng.lat();
+  //   const lng = e.latLng.lng();
+  //   setFormData({
+  //     ...formData,
+  //     location: {
+  //       lat: lat,
+  //       lng: lng,
+  //     },
+  //   });
+  // };
+  // // to send to backend
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+  //   // console.log(formData);
+  //   // console.log(pic)
+  //   const sendForm = new FormData();
+  //   sendForm.append("pic", pic);
+  //   sendForm.append("data", JSON.stringify(formData));
+  //   try {
+  //     const res = await axios.post("http://localhost/submitissue", sendForm, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     });
+  //     const data = res.data;
+  //     if (data.success) {
+  //       setResID(data.issueID);
+  //       setFormData({
+  //         issue: "",
+  //         priority: priorityOptions[0],
+  //         // picture: "",
+  //       });
+  //       setPic(null);
+  //       setShowReportModal(false);
+  //     } else {
+  //       setResID("Couldnt save to database try to send again");
+  //     }
+  //     // console.log(data)
+  //   } catch (err) {
+  //     console.log(err);
+  //     setError(err);
+  //   }
+  // };
   return (
     <>
     <div className="min-h-screen bg-gray-100">
@@ -107,7 +120,7 @@ export default function User() {
             fontSize: 'clamp(1.5rem, 5vw, 3.75rem)',
             marginBottom: 'clamp(1rem, 3vw, 2rem)'
           }}>
-           Hello User
+           Hello {userData.name}
           </h1>
           <br />
           <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed px-4" style={{

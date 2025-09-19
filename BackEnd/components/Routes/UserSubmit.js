@@ -18,6 +18,7 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
   let tempPic = "";
   try {
     const data = JSON.parse(req.body.data);
+    console.log('data is',data);
     const ext = req.file.originalname.split(".").pop();
     // store the pic in a temporary location
     tempPic = path.join(
@@ -31,22 +32,24 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
       folder: "CrowdIssues",
       resource_type: "image",
     });
-
+    
     // currently stores like this will be changed when I add Authentication
     // TODO
-    const client = await Client.connect(APIURL);
-    const API_result = await client.predict("/predict", {
-      text: data.issue,
-    });
-    const API_data = API_result.data[0];
-    console.log(API_data);
+    // const client = await Client.connect(APIURL);
+    // const API_result = await client.predict("/predict", {
+    //   text: data.issue,
+    // });
+    // const API_data = API_result.data[0];
+    // console.log(API_data);
     const issueData = {
       ID: randomID(),
       location: data.location,
-      priority: API_data.Priority.toLowerCase(),
+      // priority: API_data.Priority.toLowerCase(),
+      priority : data.priority,
       imgURL: result.secure_url,
-      description: API_data.Complaint,
-      department: API_data.Predicted_Category, // may change based on the API Update
+      // description: API_data.Complaint,
+      description : data.issue,
+      // department: API_data.Predicted_Category, // may change based on the API Update
     };
     const newIssue = new Issue(issueData);
     await newIssue.save();
