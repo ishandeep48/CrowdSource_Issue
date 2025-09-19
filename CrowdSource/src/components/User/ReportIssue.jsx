@@ -349,7 +349,7 @@ export default function ReportIssue() {
                     zoom={15}
                     onClick={mapClickHandler}
                     onLoad={handleMapLoad}
-                    key={`${formData.location.lat}-${formData.location.lng}`}
+                    // key={`${formData.location.lat}-${formData.location.lng}`}
                     options={{
                       streetViewControl: false,
                       mapTypeControl: false,
