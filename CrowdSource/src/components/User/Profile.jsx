@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import{useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import Navbar from "./NavbarUser";
 import ReportedIssuesPanel from "./ReportedIssuesPanel";
 
@@ -8,15 +8,21 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
-    axios
-      .get("/api/user/profile")
-      .then((res) => setUser(res.data))
-      .catch((err) => console.error(err));
+    const getUserData = async () => {
+      const response = await axios.get("http://localhost/user/profile", {
+        withCredentials: true,
+      });
+      const userData = response.data;
+      // console.log(data);
+      console.log(userData);
+      setUser(userData);
+    };
+    getUserData();
   }, []);
-  const handleLogout = () =>{
-    localStorage.removeItem('userDetail')
-    navigate('/')
-  }
+  const handleLogout = () => {
+    localStorage.removeItem("userDetail");
+    navigate("/");
+  };
   if (!user) {
     return (
       <>
@@ -45,24 +51,30 @@ export default function ProfilePage() {
               <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <p className="text-gray-500 text-sm">Name</p>
-                  <p className="text-lg font-semibold">{user.name}</p>
+                  <p className="text-lg font-semibold text-black">
+                    {user.name}
+                  </p>
                 </div>
 
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <p className="text-gray-500 text-sm">Email</p>
-                  <p className="text-lg font-semibold">{user.email}</p>
+                  <p className="text-lg font-semibold text-black">
+                    {user.email}
+                  </p>
                 </div>
 
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-gray-500 text-sm">Phone</p>
-                  <p className="text-lg font-semibold">
+                  <p className="text-gray-500 text-sm ">Phone</p>
+                  <p className="text-lg font-semibold text-black">
                     {user.phone || "Not Provided"}
                   </p>
                 </div>
 
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <p className="text-gray-500 text-sm">Aadhaar</p>
-                  <p className="text-lg font-semibold">{user.aadhaar}</p>
+                  <p className="text-lg font-semibold text-black">
+                    {user.aadhaar}
+                  </p>
                 </div>
 
                 <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -76,7 +88,7 @@ export default function ProfilePage() {
               {/* Right: Profile Picture */}
               <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-sm p-6">
                 <img
-                  src="https://via.placeholder.com/150"
+                  src="https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small_2x/default-avatar-photo-placeholder-profile-icon-vector.jpg"
                   alt="Profile"
                   className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
                 />
@@ -86,7 +98,10 @@ export default function ProfilePage() {
                 </button>
               </div>
             </div>
-            <button className="mt-4 px-4 py-2 bg-red-500 text-white text-sm rounded-sm hover:bg-red-600" onClick={handleLogout}>
+            <button
+              className="mt-4 px-4 py-2 bg-red-500 text-white text-sm rounded-sm hover:bg-red-600"
+              onClick={handleLogout}
+            >
               Logout
             </button>
           </div>

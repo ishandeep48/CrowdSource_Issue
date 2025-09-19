@@ -26,4 +26,19 @@ router.get("/reportedissues", authenticateTokenUser, async (req, res) => {
   }
 });
 
+router.get("/user/profile", authenticateTokenUser, async (req, res) => {
+    const user = req.user;
+    const email = user.email;
+    try{
+        const userData = await User.findOne({email}).select('-password -__v -createdAt -updatedAt');
+        if(!userData){
+            return res.status(400).json({success:false, message:"User not found"});
+        }
+        return res.status(200).json(userData);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ success: false, message: "Couldnt fetch user data" });
+    }
+})
+
 export default router;

@@ -108,8 +108,12 @@ export default function ReportedIssuesPage() {
                     <td className="py-3 px-4 text-gray-600">
                       {new Date(issue.reportedAt).toLocaleDateString("en-US", {
                         year: "numeric",
-                        month: "long",
+                        month: "short",
                         day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
                       })}
                     </td>
                   </tr>
@@ -168,8 +172,12 @@ export default function ReportedIssuesPage() {
                       "en-US",
                       {
                         year: "numeric",
-                        month: "long",
+                        month: "short",
                         day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
                       }
                     )}
                   </p>
