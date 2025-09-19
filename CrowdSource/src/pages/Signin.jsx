@@ -24,7 +24,6 @@ export default function Signin() {
         withCredentials: true // check the signup page line 41
       })
       const response = result.data;
-      console.log(response)
       // console.log(response)
       if(response.message){
         //Login Success replace with the navigation or any other logic

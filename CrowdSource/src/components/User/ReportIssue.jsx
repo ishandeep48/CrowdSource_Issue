@@ -85,6 +85,7 @@ export default function ReportIssue() {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        withCredentials:true
       });
       const data = res.data;
       if (data.success) {

@@ -1,57 +1,31 @@
-import NavbarUser from "./NavbarUser"; 
+import { useEffect } from "react";
+import NavbarUser from "./NavbarUser";
 import { useState } from "react";
+import axios from "axios";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
 export default function ReportedIssuesPage() {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const [issues] = useState([
-    {
-      id: "ISS-101",
-      issue: "Streetlight not working near park",
-      priority: "high",
-      status: "pending",
-      date: "2025-09-15",
-      // Additional details for the modal
-      description: "The streetlight near the entrance of Central Park has been flickering and completely stopped working two days ago. It's causing safety concerns for evening park visitors.",
-      location: "Near Central Park entrance",
-      department: "Public Works",
-      updates: [
-        { date: "2025-09-16", message: "Issue has been received and is being reviewed." },
-        { date: "2025-09-17", message: "A technician has been assigned to inspect the issue." }
-      ]
-    },
-    {
-      id: "ISS-102",
-      issue: "Pothole on main road",
-      priority: "medium",
-      status: "resolved",
-      date: "2025-09-12",
-      // Additional details for the modal
-      description: "Large pothole (approx 2ft diameter, 6in deep) on Main Street between 5th and 6th Avenue. Several cars have reported damage to their tires.",
-      location: "Main Street between 5th and 6th Ave",
-      department: "Transportation",
-      updates: [
-        { date: "2025-09-13", message: "Issue confirmed and added to repair schedule." },
-        { date: "2025-09-14", message: "Pothole has been repaired and road is safe for travel." }
-      ]
-    },
-    {
-      id: "ISS-103",
-      issue: "Garbage not collected",
-      priority: "critical",
-      status: "pending",
-      date: "2025-09-10",
-      // Additional details for the modal
-      description: "Garbage hasn't been collected for 5 days in the downtown area. Bins are overflowing and creating sanitation issues.",
-      location: "Downtown area, 3rd Street",
-      department: "Sanitation",
-      updates: [
-        { date: "2025-09-11", message: "Issue logged and being investigated." }
-      ]
-    },
-  ]);
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+  const [issues, setIssues] = useState([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const reponse = await axios.get("http://localhost/reportedissues", {
+        withCredentials: true,
+      });
+      const issues = reponse.data.issues;
+      console.log(issues);
+      setIssues(issues);
+    };
+    getData();
+  }, []);
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: API_KEY,
+  });
   const priorityColors = {
     low: "bg-green-100 text-green-700 border-green-300",
     medium: "bg-yellow-100 text-yellow-700 border-yellow-300",
@@ -60,8 +34,11 @@ export default function ReportedIssuesPage() {
   };
 
   const statusColors = {
-    pending: "bg-yellow-50 text-yellow-700 border-yellow-300",
+    reported: "bg-blue-50 text-blue-700 border-blue-300",
+    reviewed: "bg-purple-50 text-purple-700 border-purple-300",
+    forwarded: "bg-orange-50 text-orange-700 border-orange-300",
     resolved: "bg-green-50 text-green-700 border-green-300",
+    cancelled: "bg-red-50 text-red-700 border-red-300",
   };
 
   const handleRowClick = (issue) => {
@@ -100,29 +77,41 @@ export default function ReportedIssuesPage() {
               <tbody>
                 {issues.map((issue) => (
                   <tr
-                    key={issue.id}
+                    key={issue.ID}
                     className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
                     onClick={() => handleRowClick(issue)}
                   >
                     <td className="py-3 px-4 font-medium text-gray-800">
-                      {issue.id}
+                      {issue.ID}
                     </td>
-                    <td className="py-3 px-4 text-gray-700">{issue.issue}</td>
+                    <td className="py-3 px-4 text-gray-700">
+                      {issue.description}
+                    </td>
                     <td className="py-3 px-4">
                       <span
-                        className={`px-3 py-1 rounded-lg text-sm font-medium border ${priorityColors[issue.priority]}`}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium border ${
+                          priorityColors[issue.priority]
+                        }`}
                       >
                         {issue.priority.toUpperCase()}
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       <span
-                        className={`px-3 py-1 rounded-lg text-sm font-medium border ${statusColors[issue.status]}`}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium border ${
+                          statusColors[issue.status]
+                        }`}
                       >
                         {issue.status.toUpperCase()}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{issue.date}</td>
+                    <td className="py-3 px-4 text-gray-600">
+                      {new Date(issue.reportedAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -134,34 +123,67 @@ export default function ReportedIssuesPage() {
       {/* Modal for issue details */}
       {isModalOpen && selectedIssue && (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">Issue Details</h2>
-              <button 
+              <h2 className="text-2xl font-bold text-gray-800">
+                Issue Details
+              </h2>
+              <button
                 onClick={closeModal}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Issue ID</h3>
-                  <p className="text-lg font-semibold text-gray-900">{selectedIssue.id}</p>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Issue ID
+                  </h3>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {selectedIssue.ID}
+                  </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Date Reported</h3>
-                  <p className="text-lg text-gray-900">{selectedIssue.date}</p>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Date Reported
+                  </h3>
+                  <p className="text-lg text-gray-900">
+                    {new Date(selectedIssue.reportedAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
+                  </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Priority</h3>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Priority
+                  </h3>
                   <p className="text-lg">
-                    <span className={`px-2 py-1 rounded ${priorityColors[selectedIssue.priority]}`}>
+                    <span
+                      className={`px-2 py-1 rounded ${
+                        priorityColors[selectedIssue.priority]
+                      }`}
+                    >
                       {selectedIssue.priority.toUpperCase()}
                     </span>
                   </p>
@@ -169,30 +191,145 @@ export default function ReportedIssuesPage() {
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Status</h3>
                   <p className="text-lg">
-                    <span className={`px-2 py-1 rounded ${statusColors[selectedIssue.status]}`}>
+                    <span
+                      className={`px-2 py-1 rounded ${
+                        statusColors[selectedIssue.status]
+                      }`}
+                    >
                       {selectedIssue.status.toUpperCase()}
                     </span>
                   </p>
                 </div>
               </div>
-              
+
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500">Issue Description</h3>
-                <p className="text-lg mt-1 bg-gray-100 text-gray-900 p-4 rounded-lg leading-relaxed">{selectedIssue.description}</p>
+                <h3 className="text-sm font-medium text-gray-500">
+                  Issue Description
+                </h3>
+                <p className="text-lg mt-1 bg-gray-100 text-gray-900 p-4 rounded-lg leading-relaxed">
+                  {selectedIssue.description}
+                </p>
               </div>
-              
-              <div className="mb-6">
+
+              {/* Reported Image */}
+              {/* <div className="mb-6">
+  <h3 className="text-sm font-medium text-gray-500">Reported Image</h3>
+  <div className="mt-2">
+    {selectedIssue.imgURL ? (
+      <img
+        src={selectedIssue.imgURL}
+        alt="Reported Issue"
+        className="rounded-lg shadow-md max-h-96 w-full object-cover border border-gray-200"
+      />
+    ) : (
+      <p className="text-gray-500 italic">No image provided</p>
+    )}
+  </div>
+</div> */}
+
+              {/* location */}
+              {/* <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-500">Location</h3>
-                <p className="text-lg mt-1 text-gray-900">{selectedIssue.location}</p>
+                <div
+                  className="border rounded-lg overflow-hidden shadow-md mb-4"
+                  style={{ height: "400px" }}
+                >
+                  
+                  {isLoaded ? (
+                    <GoogleMap
+                      mapContainerStyle={{
+                        width: "100%",
+                        height: "400px",
+                      }}
+                      center={selectedIssue.location}
+                      zoom={13}
+                      options={{
+                        streetViewControl: false,
+                        mapTypeControl: false,
+                        fullscreenControl: false,
+                      }}
+                    >
+                      <Marker position={selectedIssue.location} />
+                    </GoogleMap>
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-gray-100">
+                      <p className="text-gray-500">Loading Map...</p>
+                    </div>
+                  )}
+
+                  
+                </div>
+                
+              </div> */}
+
+              {/* Location + Reported Image side by side */}
+              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Location */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Location
+                  </h3>
+                  <div
+                    className="border rounded-lg overflow-hidden shadow-md mt-2"
+                    style={{ height: "400px" }}
+                  >
+                    {isLoaded ? (
+                      <GoogleMap
+                        mapContainerStyle={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                        center={selectedIssue.location}
+                        zoom={13}
+                        options={{
+                          streetViewControl: false,
+                          mapTypeControl: false,
+                          fullscreenControl: false,
+                        }}
+                      >
+                        <Marker position={selectedIssue.location} />
+                      </GoogleMap>
+                    ) : (
+                      <div className="flex items-center justify-center h-full bg-gray-100">
+                        <p className="text-gray-500">Loading Map...</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Reported Image */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Reported Image
+                  </h3>
+                  <div className="mt-2">
+                    {selectedIssue.imgURL ? (
+                      <img
+                        src={selectedIssue.imgURL}
+                        alt="Reported Issue"
+                        className="rounded-lg shadow-md w-full h-[400px] object-contain border border-gray-200"
+                      />
+                    ) : (
+                      <p className="text-gray-500 italic">No image provided</p>
+                    )}
+                  </div>
+                </div>
               </div>
-              
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500">Assigned Department</h3>
-                <p className="text-lg mt-1 text-gray-900">{selectedIssue.department}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium text-gray-800 mb-3">Status Updates</h3>
+
+              {/* add this when we add the department thing */}
+              {/* <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-500">
+                  Assigned Department
+                </h3>
+                <p className="text-lg mt-1 text-gray-900">
+                  {selectedIssue.department}
+                </p>
+              </div> */}
+
+              {/* <div>
+                <h3 className="text-lg font-medium text-gray-800 mb-3">
+                  Status Updates
+                </h3>
                 <div className="space-y-4">
                   {selectedIssue.updates.map((update, index) => (
                     <div key={index} className="flex">
@@ -203,18 +340,20 @@ export default function ReportedIssuesPage() {
                         )}
                       </div>
                       <div className="pb-4">
-                        <p className="text-sm font-medium text-gray-500">{update.date}</p>
+                        <p className="text-sm font-medium text-gray-500">
+                          {update.date}
+                        </p>
                         <p className="text-gray-800">{update.message}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </div>
-            
+
             <div className="p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
               <div className="flex justify-end">
-                <button 
+                <button
                   onClick={closeModal}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
                 >

@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "./NavbarUser"; 
+import{useNavigate} from 'react-router-dom'
+import Navbar from "./NavbarUser";
 import ReportedIssuesPanel from "./ReportedIssuesPanel";
-
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
-    axios.get("/api/user/profile")
+    axios
+      .get("/api/user/profile")
       .then((res) => setUser(res.data))
       .catch((err) => console.error(err));
   }, []);
-
+  const handleLogout = () =>{
+    localStorage.removeItem('userDetail')
+    navigate('/')
+  }
   if (!user) {
     return (
       <>
@@ -68,7 +72,6 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </div>
-             
 
               {/* Right: Profile Picture */}
               <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-sm p-6">
@@ -81,10 +84,11 @@ export default function ProfilePage() {
                 <button className="mt-4 px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">
                   Change Photo
                 </button>
-
               </div>
-            
             </div>
+            <button className="mt-4 px-4 py-2 bg-red-500 text-white text-sm rounded-sm hover:bg-red-600" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         </div>
       </div>
