@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NavbarUser from "./NavbarUser";
@@ -20,22 +20,25 @@ export default function ReportIssue() {
   const [resID, setResID] = useState(null);
   const [error, setError] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: API_KEY,
+  });
   // Speech Recognition
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
   const [language, setLanguage] = useState("en-US");
 
-
-
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return console.warn("Speech Recognition not supported");
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition)
+      return console.warn("Speech Recognition not supported");
 
     recognitionRef.current = new SpeechRecognition();
     recognitionRef.current.continuous = true;
     recognitionRef.current.interimResults = true;
-    recognitionRef.current.lang = "en-US", "en-IN";
+    (recognitionRef.current.lang = "en-US"), "en-IN";
 
     recognitionRef.current.onresult = (event) => {
       const transcript = Array.from(event.results)
@@ -72,34 +75,33 @@ export default function ReportIssue() {
 
   // Get user location
   const getLocation = () => {
-  if (!navigator.geolocation) {
-    setError("Geolocation is not supported by your browser");
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      setFormData(prev => ({
-        ...prev,
-        location: {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        },
-      }));
-    },
-    (err) => {
-      setError(err.message);
-      setFormData(prev => ({
-        ...prev,
-        location: {
-          lat: 40.7128,
-          lng: -74.0060,
-        },
-      }));
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
     }
-  );
-};
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          },
+        }));
+      },
+      (err) => {
+        setError(err.message);
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            lat: 40.7128,
+            lng: -74.006,
+          },
+        }));
+      }
+    );
+  };
 
-  
   useLayoutEffect(() => {
     getLocation();
   }, []);
@@ -129,14 +131,14 @@ export default function ReportIssue() {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        withCredentials:true
+        withCredentials: true,
       });
       const data = res.data;
       if (data.success) {
         setResID(data.issueID);
         setFormData(formDataStruct);
-        console.log('form data set to default')
-        
+        console.log("form data set to default");
+
         setPic(null);
         setError(null);
         getLocation();
@@ -184,38 +186,47 @@ export default function ReportIssue() {
       {/* Report Issue Form */}
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Report an Issue</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+            Report an Issue
+          </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Issue Description + Speech */}
             <div className="relative">
-              <label htmlFor="issue" className="block text-lg font-semibold text-gray-800 mb-2">
+              <label
+                htmlFor="issue"
+                className="block text-lg font-semibold text-gray-800 mb-2"
+              >
                 Issue Description
               </label>
               <div className="mb-4">
-  <label htmlFor="language" className="block text-gray-700 font-medium mb-2">
-<br />
-    Select Language
-  </label>
- 
-  <select
-    id="language"
-    value={language}
-    onChange={(e) => setLanguage(e.target.value)}
-    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-  >
-    <option value="en-US">English (US)</option>
-    
-    <option value="hi-IN">हिंदी (Hindi)</option>
-    
-  </select>
-</div>
+                <label
+                  htmlFor="language"
+                  className="block text-gray-700 font-medium mb-2"
+                >
+                  <br />
+                  Select Language
+                </label>
+
+                <select
+                  id="language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                >
+                  <option value="en-US">English (US)</option>
+
+                  <option value="hi-IN">हिंदी (Hindi)</option>
+                </select>
+              </div>
 
               <textarea
                 id="issue"
                 placeholder="Describe the issue in detail..."
                 value={formData.issue}
-                onChange={(e) => setFormData({ ...formData, issue: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, issue: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                 rows={4}
                 required
@@ -224,18 +235,45 @@ export default function ReportIssue() {
                 type="button"
                 onClick={toggleListening}
                 className={`absolute bottom-3 right-3 p-2 rounded-full ${
-                  isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : "bg-blue-500 hover:bg-blue-600"
+                  isListening
+                    ? "bg-red-500 hover:bg-red-600 animate-pulse"
+                    : "bg-blue-500 hover:bg-blue-600"
                 } text-white transition-colors`}
                 title={isListening ? "Stop recording" : "Start speech-to-text"}
               >
                 {isListening ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                    />
                   </svg>
                 )}
               </button>
@@ -243,7 +281,10 @@ export default function ReportIssue() {
 
             {/* Priority */}
             <div>
-              <label htmlFor="priority" className="block text-lg font-semibold text-gray-800 mb-2">
+              <label
+                htmlFor="priority"
+                className="block text-lg font-semibold text-gray-800 mb-2"
+              >
                 Priority Level
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -261,7 +302,9 @@ export default function ReportIssue() {
                           : "bg-green-100 border-green-500 text-green-700"
                         : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
                     }`}
-                    onClick={() => setFormData({ ...formData, priority: option })}
+                    onClick={() =>
+                      setFormData({ ...formData, priority: option })
+                    }
                   >
                     <span className="font-medium">{option.toUpperCase()}</span>
                   </div>
@@ -271,22 +314,35 @@ export default function ReportIssue() {
 
             {/* Location */}
             <div>
-              <label className="block text-lg font-semibold text-gray-800 mb-2">Location</label>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Location
+              </label>
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-700">Longitude:</span>
-                    <p className="text-blue-700 font-mono">{formData.location.lng.toFixed(6)}</p>
+                    <span className="font-medium text-gray-700">
+                      Longitude:
+                    </span>
+                    <p className="text-blue-700 font-mono">
+                      {formData.location.lng.toFixed(6)}
+                    </p>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Latitude:</span>
-                    <p className="text-blue-700 font-mono">{formData.location.lat.toFixed(6)}</p>
+                    <p className="text-blue-700 font-mono">
+                      {formData.location.lat.toFixed(6)}
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-blue-600 mt-2">Click on the map to change location</p>
+                <p className="text-xs text-blue-600 mt-2">
+                  Click on the map to change location
+                </p>
               </div>
-              <div className="border rounded-lg overflow-hidden shadow-md mb-4" style={{ height: "400px" }}>
-                <LoadScript googleMapsApiKey={API_KEY}>
+              <div
+                className="border rounded-lg overflow-hidden shadow-md mb-4"
+                style={{ height: "400px" }}
+              >
+                {isLoaded ? (
                   <GoogleMap
                     mapContainerStyle={containerStyle}
                     center={formData.location}
@@ -294,17 +350,28 @@ export default function ReportIssue() {
                     onClick={mapClickHandler}
                     onLoad={handleMapLoad}
                     key={`${formData.location.lat}-${formData.location.lng}`}
-                    options={{ streetViewControl: false, mapTypeControl: false, fullscreenControl: false }}
+                    options={{
+                      streetViewControl: false,
+                      mapTypeControl: false,
+                      fullscreenControl: false,
+                    }}
                   >
                     <Marker position={formData.location} />
                   </GoogleMap>
-                </LoadScript>
+                ) : (
+                  <div className="flex items-center justify-center h-full bg-gray-100">
+                    <p className="text-gray-500">Loading Map...</p>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Picture Upload */}
             <div>
-              <label htmlFor="picture" className="block text-lg font-semibold text-gray-800 mb-2">
+              <label
+                htmlFor="picture"
+                className="block text-lg font-semibold text-gray-800 mb-2"
+              >
                 Upload Picture
               </label>
               <div className="flex items-center justify-center w-full">
@@ -324,7 +391,11 @@ export default function ReportIssue() {
                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    <p className="text-sm text-gray-500">{pic ? "Change image" : "Click to upload or drag and drop"}</p>
+                    <p className="text-sm text-gray-500">
+                      {pic
+                        ? "Change image"
+                        : "Click to upload or drag and drop"}
+                    </p>
                   </div>
                   <input
                     id="picture"
@@ -339,7 +410,9 @@ export default function ReportIssue() {
               </div>
               {pic && (
                 <div className="mt-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Preview:
+                  </p>
                   <div className="relative inline-block">
                     <img
                       src={URL.createObjectURL(pic)}
@@ -351,8 +424,19 @@ export default function ReportIssue() {
                       onClick={() => setPic(null)}
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -384,8 +468,19 @@ export default function ReportIssue() {
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg max-w-sm">
           <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <p>Error: {error}</p>
           </div>
@@ -395,8 +490,19 @@ export default function ReportIssue() {
       {resID && (
         <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg max-w-sm">
           <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <p>Issue reported successfully! ID: {resID}</p>
           </div>
