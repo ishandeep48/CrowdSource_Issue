@@ -1,13 +1,14 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-// import "./App.css";
+// import './App.css'
 
-// import Heatmap from './components/Admin/Heatmap';
+import User from  './components/User/User'
+import Heatmap from './components/Admin/Heatmap';
 // import AdminLogin from './components/Admin/AdminLogin';
-import Dashboard from "./components/Admin/Dashboard";
-import Home from "./pages/Home";
-// import Admin from './components/Admin/Heatmap'
-import User from "./components/User/User";
+import Dashboard from './components/Admin/Dashboard';
+import Home from './pages/Home'
+import Admin from './components/Admin/Heatmap' 
+// import User from './components/User/User'
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 import ReportIssue from "./components/User/ReportIssue";
@@ -17,6 +18,11 @@ import ReportedIssuesPage from "./components/User/ReportedIssuesPanel";
 export default function App() {
   return (
     <Routes>
+
+      <Route path="/" element={<User />} />
+      <Route path="/heatmap" element={<Heatmap />} />
+      {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
+      <Route path="/admin/dashboard" element={<Dashboard />} />
       <Route path="/" element={<Home />} />
       {/* <Route path="/heatmap" element={<Heatmap />} /> */}
       {/* <Route path="/admin/login" element={<AdminLogin />} /> */}

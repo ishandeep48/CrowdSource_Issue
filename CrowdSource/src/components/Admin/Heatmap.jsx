@@ -88,11 +88,24 @@ export default function Heatmap({ center }) {
   return (
     <div style={{ display: "flex", height: "100%" }}>
       {/* --- FILTER PANEL --- */}
-      <div style={{ width: "25%", padding: "10px", background: "#f8f9fa", borderRight: "1px solid #ddd" }}>
-        <h3>Filters</h3>
-        <div>
-          <label>Priority: </label>
+      <div
+        style={{
+          width: "25%",
+          padding: "10px",
+          backgroundColor: "#ffffff", // white background
+          borderRight: "1px solid #ddd",
+          boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
+          zIndex: 10,
+          height: "100%",
+          overflowY: "auto",
+        }}
+      >
+        <h3 className="text-lg font-semibold mb-4 text-gray-800">Filters</h3>
+
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Priority:</label>
           <select
+            className="w-full border border-gray-300 rounded px-2 py-1 text-gray-800 bg-white"
             value={filters.priority}
             onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
           >
@@ -102,9 +115,11 @@ export default function Heatmap({ center }) {
             <option value="low">Low</option>
           </select>
         </div>
-        <div>
-          <label>Department: </label>
+
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Department:</label>
           <select
+            className="w-full border border-gray-300 rounded px-2 py-1 text-gray-800 bg-white"
             value={filters.department}
             onChange={(e) => setFilters({ ...filters, department: e.target.value })}
           >
@@ -115,15 +130,18 @@ export default function Heatmap({ center }) {
             <option value="water">Water</option>
           </select>
         </div>
-        <div>
-          <label>Min Reports: </label>
+
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Min Reports:</label>
           <input
             type="number"
+            className="w-full border border-gray-300 rounded px-2 py-1 text-gray-800 bg-white"
             value={filters.minReports}
             onChange={(e) => setFilters({ ...filters, minReports: Number(e.target.value) })}
           />
         </div>
       </div>
+
 
       {/* --- MAP SECTION --- */}
       <GoogleMap
