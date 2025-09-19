@@ -4,11 +4,11 @@ import './App.css'
 
 import User from  './components/User/User'
 import Heatmap from './components/Admin/Heatmap';
-import AdminLogin from './components/Admin/AdminLogin';
+// import AdminLogin from './components/Admin/AdminLogin';
 import Dashboard from './components/Admin/Dashboard';
 import Home from './pages/Home'
 import Admin from './components/Admin/Heatmap' 
-import User from './components/User/User'
+// import User from './components/User/User'
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 
@@ -18,7 +18,7 @@ return(
 
       <Route path="/" element={<User />} />
       <Route path="/heatmap" element={<Heatmap />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
+      {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
       <Route path="/admin/dashboard" element={<Dashboard />} />
       <Route path="/" element={<Home />} />
       <Route path="/admin" element={<Admin/>}/>
