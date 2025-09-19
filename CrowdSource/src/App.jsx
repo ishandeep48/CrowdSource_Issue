@@ -22,7 +22,7 @@ export default function App() {
       <Route path="/" element={<User />} />
       <Route path="/heatmap" element={<Heatmap />} />
       {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
-      <Route path="/admin/dashboard" element={<Dashboard />} />
+      {/* <Route path="/admin/" element={<Dashboard />} /> */}
       <Route path="/" element={<Home />} />
       {/* <Route path="/heatmap" element={<Heatmap />} /> */}
       {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
