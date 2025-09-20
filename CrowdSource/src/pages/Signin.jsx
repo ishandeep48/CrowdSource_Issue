@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import icon from "../assets/loginicon.png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
@@ -113,6 +114,12 @@ export default function Signin() {
           >
             Sign up
           </button>
+          <div className="mt-4 text-sm text-[#5E5E5E] font-semibold">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-[#1E5EFF] hover:underline">
+              Sign up
+            </Link>
+          </div>
         </div>
       </div>
     </div>
