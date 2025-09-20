@@ -33,9 +33,9 @@ export default function App() {
       <Route
         path="/user"
         element={
-          <ProtectedUser>
+          // <ProtectedUser>
             <User />
-          </ProtectedUser>
+          // </ProtectedUser>
         }
       />
       <Route path="/signup" element={<Signup />} />
@@ -43,25 +43,25 @@ export default function App() {
       <Route
         path="/report-issue"
         element={
-          <ProtectedUser>
+          // <ProtectedUser>
             <ReportIssue />
-          </ProtectedUser>
+          // </ProtectedUser>
         }
       />
       <Route
         path="/profile"
         element={
-          <ProtectedUser>
+          // <ProtectedUser>
             <ProfilePage />
-          </ProtectedUser>
+          // </ProtectedUser>
         }
       />
       <Route
         path="/reported-issues"
         element={
-          <ProtectedUser>
+          // <ProtectedUser>
             <ReportedIssuesPage />
-          </ProtectedUser>
+          // </ProtectedUser>
         }
       />
       <Route

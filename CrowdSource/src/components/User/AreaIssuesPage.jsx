@@ -7,7 +7,8 @@ const mockIssues = [
     id: "1",
     title: "Pothole on Main Street",
     description: "There's a large pothole causing traffic jams.",
-    imageUrl: "https://cdn.shopify.com/s/files/1/0274/7288/7913/files/MicrosoftTeams-image_32.jpg?v=1705315718",
+    imageUrl:
+      "https://cdn.shopify.com/s/files/1/0274/7288/7913/files/MicrosoftTeams-image_32.jpg?v=1705315718",
     postedBy: "John Doe",
     location: "Main Street, Verdant City",
     status: "Pending",
@@ -19,7 +20,8 @@ const mockIssues = [
     id: "2",
     title: "Streetlight not working",
     description: "The streetlight near Park Avenue is broken.",
-    imageUrl: "https://www.shutterstock.com/image-photo/broken-street-lamp-against-blue-600nw-2440253019.jpg",
+    imageUrl:
+      "https://www.shutterstock.com/image-photo/broken-street-lamp-against-blue-600nw-2440253019.jpg",
     postedBy: "Jane Smith",
     location: "Park Avenue, Verdant City",
     status: "In Progress",
@@ -31,7 +33,7 @@ const mockIssues = [
 
 export default function AreaIssuesPage() {
   const [issues, setIssues] = useState([]);
-  const [selectedIssue, setSelectedIssue] = useState(null); // for modal
+  const [selectedIssue, setSelectedIssue] = useState(null);
 
   useEffect(() => {
     const sortedIssues = mockIssues.sort(
@@ -49,7 +51,7 @@ export default function AreaIssuesPage() {
   };
 
   const handleViewDetails = (issue) => {
-    setSelectedIssue(issue); // open modal
+    setSelectedIssue(issue);
   };
 
   const closeModal = () => {
@@ -60,29 +62,33 @@ export default function AreaIssuesPage() {
     <>
       <NavbarUser />
       <div className="min-h-screen bg-gray-100">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
             Reported Issues in Your Area
           </h1>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {issues.map((issue) => (
               <div
                 key={issue.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer"
+                className="bg-white rounded-lg sm:rounded-xl shadow-md sm:shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
                 onClick={() => handleViewDetails(issue)}
               >
                 <img
                   src={issue.imageUrl}
                   alt={issue.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-40 sm:h-48 object-cover"
                 />
-                <div className="p-4">
-                  <h2 className="text-xl font-semibold mb-2">{issue.title}</h2>
-                  <p className="text-gray-600 mb-4">{issue.description}</p>
+                <div className="p-3 sm:p-4">
+                  <h2 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
+                    {issue.title}
+                  </h2>
+                  <p className="text-gray-600 text-sm sm:text-base mb-3 sm:mb-4 line-clamp-2">
+                    {issue.description}
+                  </p>
                   <div className="flex justify-between items-center">
                     <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      className="bg-blue-500 text-white px-2 sm:px-3 py-1 text-sm sm:text-base rounded hover:bg-blue-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleUpvote(issue.id);
@@ -90,7 +96,7 @@ export default function AreaIssuesPage() {
                     >
                       ▲ ({issue.upvotes})
                     </button>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-xs sm:text-sm text-gray-500">
                       {new Date(issue.reportedAt).toLocaleString()}
                     </span>
                   </div>
@@ -102,10 +108,10 @@ export default function AreaIssuesPage() {
 
         {/* Modal */}
         {selectedIssue && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+          <div className="fixed inset-0 flex items-center justify-center z-50  px-2 sm:px-0">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-lg w-full sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 relative">
               <button
-                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                className="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-700 hover:text-gray-900 text-lg"
                 onClick={closeModal}
               >
                 ✕
@@ -113,29 +119,33 @@ export default function AreaIssuesPage() {
               <img
                 src={selectedIssue.imageUrl}
                 alt={selectedIssue.title}
-                className="w-full h-48 object-cover rounded mb-4"
+                className="w-full h-40 sm:h-48 object-cover rounded mb-3 sm:mb-4"
               />
-              <h2 className="text-2xl font-bold mb-2">{selectedIssue.title}</h2>
-              <p className="text-gray-700 mb-2">{selectedIssue.description}</p>
-              <p className="text-sm text-gray-500 mb-1">
-                <strong>Posted By:</strong> {selectedIssue.postedBy}
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">{selectedIssue.title}</h2>
+              <p className="text-gray-700 text-sm sm:text-base mb-2">
+                {selectedIssue.description}
               </p>
-              <p className="text-sm text-gray-500 mb-1">
-                <strong>Location:</strong> {selectedIssue.location}
-              </p>
-              <p className="text-sm text-gray-500 mb-1">
-                <strong>Status:</strong> {selectedIssue.status}
-              </p>
-              <p className="text-sm text-gray-500 mb-1">
-                <strong>Department:</strong> {selectedIssue.department}
-              </p>
-              <p className="text-sm text-gray-500 mb-1">
-                <strong>Reported On:</strong>{" "}
-                {selectedIssue.reportedAt.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Upvotes:</strong> {selectedIssue.upvotes}
-              </p>
+              <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
+                <p>
+                  <strong>Posted By:</strong> {selectedIssue.postedBy}
+                </p>
+                <p>
+                  <strong>Location:</strong> {selectedIssue.location}
+                </p>
+                <p>
+                  <strong>Status:</strong> {selectedIssue.status}
+                </p>
+                <p>
+                  <strong>Department:</strong> {selectedIssue.department}
+                </p>
+                <p>
+                  <strong>Reported On:</strong>{" "}
+                  {selectedIssue.reportedAt.toLocaleString()}
+                </p>
+                <p>
+                  <strong>Upvotes:</strong> {selectedIssue.upvotes}
+                </p>
+              </div>
             </div>
           </div>
         )}
