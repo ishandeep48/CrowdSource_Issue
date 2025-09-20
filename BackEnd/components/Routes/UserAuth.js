@@ -34,7 +34,7 @@ router.post("/user/register", async (req, res) => {
       { expiresIn: "20d" }
     );
     console.log("Done");
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // set to true in production
       sameSite: "strict",
@@ -105,5 +105,15 @@ router.post("/user/login", async (req, res) => {
     res.status(500).json({ message: false , error:"Server Error"});
   }
 });
+
+router.post('/user/logout', (req, res) => {
+    res.clearCookie('userToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // set to true in production
+        sameSite: "strict",
+    });
+    console.log("LOGOUT DONE")
+    res.json({ message: true });
+})
 
 export default router;

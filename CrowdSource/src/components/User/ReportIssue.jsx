@@ -125,7 +125,7 @@ export default function ReportIssue() {
     const sendForm = new FormData();
     sendForm.append("pic", pic);
     sendForm.append("data", JSON.stringify(formData));
-
+    console.log(formData)
     try {
       const res = await axios.post("http://localhost/submitissue", sendForm, {
         headers: {

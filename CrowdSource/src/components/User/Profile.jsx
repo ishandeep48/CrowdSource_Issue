@@ -19,9 +19,18 @@ export default function ProfilePage() {
     };
     getUserData();
   }, []);
-  const handleLogout = () => {
-    localStorage.removeItem("userDetail");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost/user/logout",
+        {},
+        { withCredentials: true }
+      );
+      localStorage.removeItem("userDetail");
+      navigate("/");
+    } catch (err) {
+      console.error("Logout Failed", err);
+    }
   };
   if (!user) {
     return (

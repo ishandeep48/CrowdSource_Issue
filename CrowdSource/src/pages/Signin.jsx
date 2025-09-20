@@ -26,13 +26,13 @@ export default function Signin() {
       const response = result.data;
       // console.log(response)
       if(response.message){
-        //Login Success replace with the navigation or any other logic
+        console.log(response.user)
         localStorage.setItem('userDetail',JSON.stringify(response.user))
         const userType = response.user.role;
         if(userType=='user'){
           navigate('/user')
         }else if ( userType == 'admin'){
-          navigate('/')
+          navigate('/admin')
         }
       }else{
         //Failure show some error based on what response you get

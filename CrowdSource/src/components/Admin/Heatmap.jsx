@@ -59,7 +59,7 @@ export default function Heatmap({ center }) {
   const heatmapData = useMemo(() => {
     if (!mapLoaded || !window.google || !filteredIssues) return [];
     return filteredIssues.map(
-      (issue) => new window.google.maps.LatLng(issue.location.lat, issue.location.lng)
+      (issue) => new window.google.maps.LatLng(issue.location.coordinates[1], issue.location.coordinates[0])
     );
   }, [mapLoaded, filteredIssues]);
 
@@ -68,7 +68,7 @@ export default function Heatmap({ center }) {
     return filteredIssues.map((issue) => (
       <Marker
         key={issue._id}
-        position={{ lat: issue.location.lat, lng: issue.location.lng }}
+        position={{ lat: issue.location.coordinates[1], lng: issue.location.coordinates[0] }}
         title={issue.title}
         onClick={() => setSelectedIssue(issue)}
       />

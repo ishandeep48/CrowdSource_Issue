@@ -219,57 +219,6 @@ export default function ReportedIssuesPage() {
                 </p>
               </div>
 
-              {/* Reported Image */}
-              {/* <div className="mb-6">
-  <h3 className="text-sm font-medium text-gray-500">Reported Image</h3>
-  <div className="mt-2">
-    {selectedIssue.imgURL ? (
-      <img
-        src={selectedIssue.imgURL}
-        alt="Reported Issue"
-        className="rounded-lg shadow-md max-h-96 w-full object-cover border border-gray-200"
-      />
-    ) : (
-      <p className="text-gray-500 italic">No image provided</p>
-    )}
-  </div>
-</div> */}
-
-              {/* location */}
-              {/* <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500">Location</h3>
-                <div
-                  className="border rounded-lg overflow-hidden shadow-md mb-4"
-                  style={{ height: "400px" }}
-                >
-                  
-                  {isLoaded ? (
-                    <GoogleMap
-                      mapContainerStyle={{
-                        width: "100%",
-                        height: "400px",
-                      }}
-                      center={selectedIssue.location}
-                      zoom={13}
-                      options={{
-                        streetViewControl: false,
-                        mapTypeControl: false,
-                        fullscreenControl: false,
-                      }}
-                    >
-                      <Marker position={selectedIssue.location} />
-                    </GoogleMap>
-                  ) : (
-                    <div className="flex items-center justify-center h-full bg-gray-100">
-                      <p className="text-gray-500">Loading Map...</p>
-                    </div>
-                  )}
-
-                  
-                </div>
-                
-              </div> */}
-
               {/* Location + Reported Image side by side */}
               <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Location */}
@@ -287,7 +236,10 @@ export default function ReportedIssuesPage() {
                           width: "100%",
                           height: "100%",
                         }}
-                        center={selectedIssue.location}
+                        center={{
+                          lat: selectedIssue.location.coordinates[1],
+                          lng: selectedIssue.location.coordinates[0],
+                        }}
                         zoom={13}
                         options={{
                           streetViewControl: false,
@@ -295,7 +247,12 @@ export default function ReportedIssuesPage() {
                           fullscreenControl: false,
                         }}
                       >
-                        <Marker position={selectedIssue.location} />
+                        <Marker
+                          position={{
+                            lat: selectedIssue.location.coordinates[1],
+                            lng: selectedIssue.location.coordinates[0],
+                          }}
+                        />
                       </GoogleMap>
                     ) : (
                       <div className="flex items-center justify-center h-full bg-gray-100">

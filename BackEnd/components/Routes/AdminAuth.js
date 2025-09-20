@@ -66,13 +66,18 @@ router.post("/admin/login", async (req, res) => {
       { expiresIn: "20d" }
     );
     console.log("Done Login Admin");
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // set to true in production
       sameSite: "strict",
       maxAge: 20 * 24 * 60 * 60 * 1000,
     });
-    res.status(200).json({ message: true });
+    res.status(200).json({ message: true , user:{
+      name: admin.name,
+      email: admin.email,
+      phone: admin.phone,
+      role: admin.role,
+    }});
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: false });

@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../functions/helper.js";
 
 export async function authenticateTokenUser(req, res, next) {
-  const token = req.cookies.token;
+  const token = req.cookies.userToken;
+//   console.log(token)
 //   console.log(token)
     if (!token) {
         return res.status(401).json({ message: "No token provided" });
