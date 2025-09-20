@@ -27,6 +27,13 @@ export default function Navbar() {
             Reported issues
           </button>
           <button
+  className="bg-[#1E5EFF] text-white text-sm lg:text-lg font-semibold py-2 px-3 lg:px-4 rounded-lg hover:bg-[#164bcc] transition-colors duration-200"
+  onClick={() => navigate("/area-issues")}
+>
+  Issues in Your Area
+</button>
+
+          <button
             className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
             onClick={() => navigate("/profile")}
           >
