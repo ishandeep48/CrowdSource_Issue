@@ -20,16 +20,8 @@ import AreaIssuesPage from "./components/User/AreaIssuesPage";
 export default function App() {
   return (
     <Routes>
-      {/* <Route path="/" element={<Home />} /> */}
-      {/* <Route path="/heatmap" element={<Heatmap />} /> */}
-      {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
-      {/* <Route path="/admin/" element={<Dashboard />} /> */}
       <Route path="/" element={<Home />} />
-      {/* <Route path="/heatmap" element={<Heatmap />} /> */}
-      {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
       <Route path="/admin/" element={<Dashboard />} />
-
-      {/* <Route path="/admin" element={<Admin/>}/> */}
       <Route
         path="/user"
         element={
@@ -65,9 +57,13 @@ export default function App() {
         }
       />
       <Route
-       path="/area-issues"
-        element=
-        {<AreaIssuesPage />} /> 
+        path="/area-issues"
+        element={
+          <ProtectedUser>
+            <AreaIssuesPage />
+          </ProtectedUser>
+        }
+      />
     </Routes>
   );
 }

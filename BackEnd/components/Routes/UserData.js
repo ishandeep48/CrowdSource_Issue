@@ -2,6 +2,7 @@ import express from "express";
 import User from "../Models/UserModel.js";
 import { authenticateTokenUser } from "../Middleware/authCookie.js";
 import Issue from "../Models/IssueModel.js";
+import { getNearbyIssues } from "../functions/helper.js";
 const router = express.Router();
 
 router.get("/reportedissues", authenticateTokenUser, async (req, res) => {
@@ -39,6 +40,17 @@ router.get("/user/profile", authenticateTokenUser, async (req, res) => {
         console.log(err);
         return res.status(500).json({ success: false, message: "Couldnt fetch user data" });
     }
+})
+
+
+router.post('/user/nearbyissues', authenticateTokenUser, async(req,res)=>{
+  const {location} = req.body;
+  console.log(location);
+  if(!location || !location.lat || !location.lng){
+    return res.json({success:false, error:"Location is required"});
+  }
+  const nearbyIssues = await getNearbyIssues(location, 1500);
+  return res.status(200).json({success:true, issues: nearbyIssues});
 })
 
 export default router;
