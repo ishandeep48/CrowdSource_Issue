@@ -32,7 +32,7 @@ export default function Heatmap({ center }) {
     const getIssues = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get("http://localhost/allissues");
+        const response = await axios.get("http://localhost/allissues",{withCredentials:true});
         if (response.data && Array.isArray(response.data.issues)) {
         // const issuesWithExtras = response.data.issues.map((issue) => {
         //   const [lng, lat] = issue.location.coordinates; // GeoJSON is [lng, lat]
