@@ -3,8 +3,10 @@ import NavbarUser from "./NavbarUser";
 import { useState } from "react";
 import axios from "axios";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { useNavigate } from "react-router-dom";
 
 export default function ReportedIssuesPage() {
+  const navigate = useNavigate();
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -52,85 +54,160 @@ export default function ReportedIssuesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+     <div className="min-h-screen bg-gray-100">
       {/* Navbar on top */}
       <NavbarUser />
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => navigate("/user")}
+            className="flex items-center text-blue-600 hover:text-blue-800 mb-4 sm:mb-6 transition-colors px-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
 
       {/* Page content */}
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">
+      <div className="max-w-6xl mx-auto px-2 sm:px-4 lg:px-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 px-2">
           Reported Issues
         </h1>
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-gray-600 text-sm border-b">
-                  <th className="py-3 px-4">Issue ID</th>
-                  <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4">Priority</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {issues.map((issue) => (
-                  <tr
-                    key={issue.ID}
-                    className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleRowClick(issue)}
-                  >
-                    <td className="py-3 px-4 font-medium text-gray-800">
-                      {issue.ID}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {issue.description}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-3 py-1 rounded-lg text-sm font-medium border ${
-                          priorityColors[issue.priority]
-                        }`}
-                      >
-                        {issue.priority.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-3 py-1 rounded-lg text-sm font-medium border ${
-                          statusColors[issue.status]
-                        }`}
-                      >
-                        {issue.status.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">
+        <div className="bg-white rounded-xl shadow-lg mx-2 sm:mx-0">
+          {/* Mobile Card View */}
+          <div className="block md:hidden">
+            {issues.map((issue) => (
+              <div
+                key={issue.ID}
+                className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => handleRowClick(issue)}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-medium text-gray-800 text-sm">
+                      Issue #{issue.ID}
+                    </h3>
+                    <p className="text-gray-600 text-xs mt-1">
                       {new Date(issue.reportedAt).toLocaleDateString("en-US", {
                         year: "numeric",
-                        month: "long",
+                        month: "short",
                         day: "numeric",
                       })}
-                    </td>
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium border ${
+                        priorityColors[issue.priority]
+                      }`}
+                    >
+                      {issue.priority.toUpperCase()}
+                    </span>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium border ${
+                        statusColors[issue.status]
+                      }`}
+                    >
+                      {issue.status.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-700 text-sm line-clamp-2">
+                  {issue.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="text-gray-600 text-sm border-b">
+                    <th className="py-3 px-4">Issue ID</th>
+                    <th className="py-3 px-4">Description</th>
+                    <th className="py-3 px-4">Priority</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4">Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {issues.map((issue) => (
+                    <tr
+                      key={issue.ID}
+                      className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => handleRowClick(issue)}
+                    >
+                      <td className="py-3 px-4 font-medium text-gray-800">
+                        {issue.ID}
+                      </td>
+                      <td className="py-3 px-4 text-gray-700">
+                        {issue.description}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-3 py-1 rounded-lg text-sm font-medium border ${
+                            priorityColors[issue.priority]
+                          }`}
+                        >
+                          {issue.priority.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-3 py-1 rounded-lg text-sm font-medium border ${
+                            statusColors[issue.status]
+                          }`}
+                        >
+                          {issue.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        {new Date(issue.reportedAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Modal for issue details */}
       {isModalOpen && selectedIssue && (
-        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">
+        <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50" 
+            onClick={closeModal}
+          />
+          
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto relative z-10 mx-2 sm:mx-0">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 Issue Details
               </h2>
               <button
                 onClick={closeModal}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 p-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -149,8 +226,8 @@ export default function ReportedIssuesPage() {
               </button>
             </div>
 
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">
                     Issue ID
@@ -206,64 +283,13 @@ export default function ReportedIssuesPage() {
                 <h3 className="text-sm font-medium text-gray-500">
                   Issue Description
                 </h3>
-                <p className="text-lg mt-1 bg-gray-100 text-gray-900 p-4 rounded-lg leading-relaxed">
+                <p className="text-base sm:text-lg mt-1 bg-gray-100 text-gray-900 p-3 sm:p-4 rounded-lg leading-relaxed">
                   {selectedIssue.description}
                 </p>
               </div>
 
-              {/* Reported Image */}
-              {/* <div className="mb-6">
-  <h3 className="text-sm font-medium text-gray-500">Reported Image</h3>
-  <div className="mt-2">
-    {selectedIssue.imgURL ? (
-      <img
-        src={selectedIssue.imgURL}
-        alt="Reported Issue"
-        className="rounded-lg shadow-md max-h-96 w-full object-cover border border-gray-200"
-      />
-    ) : (
-      <p className="text-gray-500 italic">No image provided</p>
-    )}
-  </div>
-</div> */}
-
-              {/* location */}
-              {/* <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500">Location</h3>
-                <div
-                  className="border rounded-lg overflow-hidden shadow-md mb-4"
-                  style={{ height: "400px" }}
-                >
-                  
-                  {isLoaded ? (
-                    <GoogleMap
-                      mapContainerStyle={{
-                        width: "100%",
-                        height: "400px",
-                      }}
-                      center={selectedIssue.location}
-                      zoom={13}
-                      options={{
-                        streetViewControl: false,
-                        mapTypeControl: false,
-                        fullscreenControl: false,
-                      }}
-                    >
-                      <Marker position={selectedIssue.location} />
-                    </GoogleMap>
-                  ) : (
-                    <div className="flex items-center justify-center h-full bg-gray-100">
-                      <p className="text-gray-500">Loading Map...</p>
-                    </div>
-                  )}
-
-                  
-                </div>
-                
-              </div> */}
-
-              {/* Location + Reported Image side by side */}
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Location + Reported Image - Mobile Stack, Desktop Side by Side */}
+              <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Location */}
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">
@@ -271,7 +297,7 @@ export default function ReportedIssuesPage() {
                   </h3>
                   <div
                     className="border rounded-lg overflow-hidden shadow-md mt-2"
-                    style={{ height: "400px" }}
+                    style={{ height: "250px" }}
                   >
                     {isLoaded ? (
                       <GoogleMap
@@ -307,55 +333,23 @@ export default function ReportedIssuesPage() {
                       <img
                         src={selectedIssue.imgURL}
                         alt="Reported Issue"
-                        className="rounded-lg shadow-md w-full h-[400px] object-contain border border-gray-200"
+                        className="rounded-lg shadow-md w-full h-[250px] object-contain border border-gray-200"
                       />
                     ) : (
-                      <p className="text-gray-500 italic">No image provided</p>
+                      <div className="rounded-lg border-2 border-dashed border-gray-300 h-[250px] flex items-center justify-center">
+                        <p className="text-gray-500 italic">No image provided</p>
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* add this when we add the department thing */}
-              {/* <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500">
-                  Assigned Department
-                </h3>
-                <p className="text-lg mt-1 text-gray-900">
-                  {selectedIssue.department}
-                </p>
-              </div> */}
-
-              {/* <div>
-                <h3 className="text-lg font-medium text-gray-800 mb-3">
-                  Status Updates
-                </h3>
-                <div className="space-y-4">
-                  {selectedIssue.updates.map((update, index) => (
-                    <div key={index} className="flex">
-                      <div className="flex flex-col items-center mr-4">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        {index < selectedIssue.updates.length - 1 && (
-                          <div className="w-0.5 h-16 bg-blue-200 mt-1"></div>
-                        )}
-                      </div>
-                      <div className="pb-4">
-                        <p className="text-sm font-medium text-gray-500">
-                          {update.date}
-                        </p>
-                        <p className="text-gray-800">{update.message}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div> */}
             </div>
 
-            <div className="p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
               <div className="flex justify-end">
                 <button
                   onClick={closeModal}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Close
                 </button>

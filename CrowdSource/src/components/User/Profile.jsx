@@ -63,58 +63,83 @@ export default function ProfilePage() {
     <>
       <Navbar />
       <div className="flex flex-col bg-white min-h-screen">
-        <div className="flex flex-col items-center py-10 px-4">
-          <div className="w-full max-w-5xl bg-gray-100 rounded-lg shadow-lg p-8">
-            <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center">
-              User Profile
-            </h1>
+        <div className="container mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => navigate("/user")}
+            className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+        </div>
+  <div className="flex flex-col items-center py-10 px-4">
+    <div className="w-full max-w-5xl bg-gray-100 rounded-lg shadow-lg p-8">
+      <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center">
+        User Profile
+      </h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-              {/* Left & Middle: User Info */}
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-gray-500 text-sm">Name</p>
-                  <p className="text-lg font-semibold">{user.name}</p>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        {/* Profile Picture → First on mobile, right side on desktop */}
+        <div className="order-1 md:order-2 flex flex-col items-center justify-center bg-white rounded-lg shadow-sm p-6">
+          <img
+            src="https://via.placeholder.com/150"
+            alt="Profile"
+            className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
+          />
+          <p className="mt-3 text-gray-600 text-sm">Profile Picture</p>
+          <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
+            Change Photo
+          </button>
+        </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-gray-500 text-sm">Email</p>
-                  <p className="text-lg font-semibold">{user.email}</p>
-                </div>
+        {/* User Info → Below picture on mobile, left side on desktop */}
+        <div className="order-2 md:order-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="text-gray-500 text-sm">Name</p>
+            <p className="text-lg font-semibold">{user.name}</p>
+          </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-gray-500 text-sm">Phone</p>
-                  <p className="text-lg font-semibold">
-                    {user.phone || "Not Provided"}
-                  </p>
-                </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="text-gray-500 text-sm">Email</p>
+            <p className="text-lg font-semibold">{user.email}</p>
+          </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-gray-500 text-sm">Aadhaar</p>
-                  <p className="text-lg font-semibold">{user.aadhaar}</p>
-                </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="text-gray-500 text-sm">Phone</p>
+            <p className="text-lg font-semibold">
+              {user.phone || "Not Provided"}
+            </p>
+          </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-gray-500 text-sm">Role</p>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                    {user.role}
-                  </span>
-                </div>
-              </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="text-gray-500 text-sm">Aadhaar</p>
+            <p className="text-lg font-semibold">{user.aadhaar}</p>
+          </div>
 
-              {/* Right: Profile Picture */}
-              <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-sm p-6">
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt="Profile"
-                  className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
-                />
-                <p className="mt-3 text-gray-600 text-sm">Profile Picture</p>
-                <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
-                  Change Photo
-                </button>
-              </div>
-            </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <p className="text-gray-500 text-sm">Role</p>
+            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+              {user.role}
+            </span>
+          </div>
+        </div>
+      </div>
+    
+  
+
            <div className="flex gap-4 mt-4">
           <button
             className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
