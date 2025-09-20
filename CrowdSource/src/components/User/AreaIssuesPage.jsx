@@ -52,7 +52,7 @@ export default function AreaIssuesPage() {
   };
 
   const handleViewDetails = (issue) => {
-    setSelectedIssue(issue); // open modal
+    setSelectedIssue(issue);
   };
 
   const closeModal = () => {
@@ -63,12 +63,12 @@ export default function AreaIssuesPage() {
     <>
       <NavbarUser />
       <div className="min-h-screen bg-gray-100">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
             Reported Issues in Your Area
           </h1>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {issues.map((issue) => (
               <div
                 key={issue.ID}
@@ -85,7 +85,7 @@ export default function AreaIssuesPage() {
                   <p className="text-gray-600 mb-4">{issue.description}</p>
                   <div className="flex justify-between items-center">
                     <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      className="bg-blue-500 text-white px-2 sm:px-3 py-1 text-sm sm:text-base rounded hover:bg-blue-600"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleUpvote(issue.ID);
@@ -93,7 +93,7 @@ export default function AreaIssuesPage() {
                     >
                       ▲ ({issue.upvotes.length})
                     </button>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-xs sm:text-sm text-gray-500">
                       {new Date(issue.reportedAt).toLocaleString()}
                     </span>
                   </div>
@@ -105,10 +105,10 @@ export default function AreaIssuesPage() {
 
         {/* Modal */}
         {selectedIssue && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+          <div className="fixed inset-0 flex items-center justify-center z-50  px-2 sm:px-0">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-lg w-full sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 relative">
               <button
-                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                className="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-700 hover:text-gray-900 text-lg"
                 onClick={closeModal}
               >
                 ✕

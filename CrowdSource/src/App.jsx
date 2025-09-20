@@ -27,7 +27,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <User />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route path="/signup" element={<Signup />} />
@@ -37,7 +37,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ReportIssue />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route
@@ -45,7 +45,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ProfilePage />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route
@@ -53,7 +53,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ReportedIssuesPage />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route
