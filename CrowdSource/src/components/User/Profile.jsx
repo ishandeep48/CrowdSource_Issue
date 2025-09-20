@@ -7,6 +7,13 @@ import ReportedIssuesPanel from "./ReportedIssuesPanel";
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const [newPassword, setNewPassword] = useState(""); // for input field
+  const [currentPassword, setCurrentPassword] = useState("");
+   const [passwordUpdated, setPasswordUpdated] = useState(false);
+   const [showPasswordInput,setShowPasswordInput] = useState(false);
+   const [modalPasswordMessage, setModalPasswordMessage] = useState("");
+   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
   useEffect(() => {
     axios
       .get("/api/user/profile")
@@ -17,6 +24,28 @@ export default function ProfilePage() {
     localStorage.removeItem('userDetail')
     navigate('/')
   }
+ const handlePasswordChange = () => {
+  if (!currentPassword || !newPassword) {
+    setModalPasswordMessage("Please enter both current and new password");
+    setShowPasswordModal(true);
+    return;
+  }
+
+  axios
+    .post("/api/user/change-password", { currentPassword, newPassword })
+    .then(() => {
+      setModalPasswordMessage("Password updated successfully!");
+      setShowPasswordModal(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setTimeout(() => setShowPasswordModal(false), 3000);
+    })
+    .catch(() => {
+      setModalPasswordMessage("Incorrect current password");
+      setShowPasswordModal(true);
+      setTimeout(() => setShowPasswordModal(false), 3000);
+    });
+};
   if (!user) {
     return (
       <>
@@ -81,14 +110,72 @@ export default function ProfilePage() {
                   className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
                 />
                 <p className="mt-3 text-gray-600 text-sm">Profile Picture</p>
-                <button className="mt-4 px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">
+                <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
                   Change Photo
                 </button>
               </div>
             </div>
-            <button className="mt-4 px-4 py-2 bg-red-500 text-white text-sm rounded-sm hover:bg-red-600" onClick={handleLogout}>
-              Logout
-            </button>
+           <div className="flex gap-4 mt-4">
+          <button
+            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+  <div className="flex gap-2 mt-4 items-center flex-wrap">
+  {/* Change Password Button */}
+  <button
+    className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
+    onClick={() => setShowPasswordInput((prev) => !prev)}
+  >
+    Change Password
+  </button>
+
+  {/* Current + New Password Inputs & Save Button */}
+  {showPasswordInput && (
+    <>
+      <input
+        type="password"
+        placeholder="Current password"
+        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="New password"
+        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
+      <button
+        className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
+        onClick={handlePasswordChange}
+      >
+        Save
+      </button>
+    </>
+  )}
+</div> 
+{passwordUpdated && (
+  <p className="text-green-600 font-medium mt-2">
+    Password updated successfully!
+  </p>
+)}
+{showPasswordModal && (
+  <div className="fixed inset-0 flex items-center justify-center  z-50">
+    <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full text-center">
+      <p className="text-gray-800 font-medium">{modalPasswordMessage}</p>
+      <button
+        className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+        onClick={() => setShowPasswordModal(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
           </div>
         </div>
       </div>
