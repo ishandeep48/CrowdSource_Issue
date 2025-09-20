@@ -1,10 +1,17 @@
-import React from "react";
+import React,{useState} from "react";
 import { FaTimes, FaShare, FaExclamationTriangle } from "react-icons/fa";
 import Heatmap from "../Admin/Heatmap"; // adjust path if needed
 
 const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
   if (!issue) return null;
-
+  const [selectedPriority, setSelectedPriority] = useState(issue?.priority || "Medium");
+  const handlePriorityChange = (e) => {
+    setSelectedPriority(e.target.value);
+  };
+  const handleChangePriorityClick = () => {
+    // console.log(issue.ID,selectedPriority)
+    onChangePriority(issue.ID, selectedPriority); // pass issue ID + new priority
+  };
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -23,39 +30,39 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
 
         <div className="p-6 space-y-6">
           <div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">{issue?.title}</h3>
-            <p className="text-gray-600">{issue?.description}</p>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">{issue.department} Issue</h3>
+            <p className="text-gray-600">{issue.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <p className="text-sm text-gray-600">{issue?.category}</p>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+              <p className="text-sm text-gray-600">{issue.department}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
               <p className="text-sm text-gray-600">{issue?.priority}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <p className="text-sm text-gray-600">{issue?.location}</p>
+              <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+              <p className="text-sm text-gray-600">{issue?.state}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Reported Date</label>
-              <p className="text-sm text-gray-600">{issue?.reportedDate}</p>
+              <p className="text-sm text-gray-600">{new Date(issue.reportedAt).toLocaleDateString()}</p>
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Citizen Information</label>
-            <p className="text-sm text-gray-600">{issue?.citizenName} - {issue?.citizenPhone}</p>
+            <p className="text-sm text-gray-600">{issue.reportedBy.name} - {issue.reportedBy.phone}</p>
           </div>
 
-          {issue?.lat && issue?.lng && (
+          {issue.location && (
             <div className="location-map">
               <h4 className="font-medium text-gray-800 mb-2">Location Map</h4>
               <div style={{ width: "100%", height: "300px" }} className="rounded-lg overflow-hidden">
-                <Heatmap center={{ lat: issue?.lat, lng: issue?.lng }} />
+                <Heatmap center={{ lat: issue.location.coordinates[1], lng: issue.location.coordinates[0] }} />
               </div>
             </div>
           )}
@@ -63,7 +70,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Forward to Department</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option>Public Works</option>
                 <option>Water Department</option>
                 <option>Sanitation</option>
@@ -71,15 +78,18 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Change Priority</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
+              <select className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              value={selectedPriority}
+              onChange={handlePriorityChange}
+              >
+                <option value ='high'>High</option>
+                <option  value ='medium'>Medium</option>
+                <option  value ='low'>Low</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
-              <select disabled className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+              <select disabled className="w-full px-3 py-2 border border-gray-300 text-black rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
                 <option>Pending</option>
                 <option>In Progress</option>
                 <option>Resolved</option>
@@ -95,7 +105,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
           <button onClick={onForward} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
             <FaShare /> Forward
           </button>
-          <button onClick={onChangePriority} className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2">
+          <button onClick={handleChangePriorityClick} className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2">
             <FaExclamationTriangle /> Change Priority
           </button>
         </div>

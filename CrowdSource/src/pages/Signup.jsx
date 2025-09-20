@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import icon from "../assets/loginicon.png";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -136,6 +137,12 @@ export default function Signup() {
           >
             Sign up
           </button>
+            <div className="mt-4 text-sm text-[#5E5E5E] font-semibold">
+            Already have an account?{" "}
+            <Link to="/signin" className="text-[#1E5EFF] hover:underline">
+              Sign in
+            </Link>
+          </div>
         </div>
       </div>
     </div>

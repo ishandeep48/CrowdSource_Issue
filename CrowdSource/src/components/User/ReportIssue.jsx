@@ -3,6 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NavbarUser from "./NavbarUser";
+import DuplicateIssueModal from "./DuplicateIssueModal";
 
 export default function ReportIssue() {
   const navigate = useNavigate();
@@ -25,53 +26,85 @@ export default function ReportIssue() {
     googleMapsApiKey: API_KEY,
   });
   // Speech Recognition
+  const [language, setLanguage] = useState("en-IN"); // default to English
+
   const [isListening, setIsListening] = useState(false);
+  const isListeningRef = useRef(false);
   const recognitionRef = useRef(null);
-  const [language, setLanguage] = useState("en-US");
 
-  useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition)
-      return console.warn("Speech Recognition not supported");
+useEffect(() => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return;
 
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = true;
-    recognitionRef.current.interimResults = true;
-    (recognitionRef.current.lang = "en-US"), "en-IN";
+  const recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = language;
 
-    recognitionRef.current.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0].transcript)
-        .join("");
-      setFormData((prev) => ({ ...prev, issue: transcript }));
-    };
+ recognition.onresult = (event) => {
+  let finalTranscript = "";
+  for (let i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal) {
+      finalTranscript += event.results[i][0].transcript;
+    }
+  }
 
-    recognitionRef.current.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
-      setIsListening(false);
-    };
+  if (finalTranscript) {
+    setFormData((prev) => ({
+      ...prev,
+      issue: prev.issue + (prev.issue ? " " : "") + finalTranscript,
+    }));
+  }
+};
 
-    recognitionRef.current.onend = () => {
-      if (isListening) recognitionRef.current.start();
-    };
 
-    return () => recognitionRef.current.stop();
-  }, [isListening]);
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error", event.error);
+    setIsListening(false);
+    isListeningRef.current = false;
+  };
 
-  const toggleListening = () => {
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
+  recognition.onend = () => {
+    if (isListeningRef.current) {
       try {
-        recognitionRef.current.start();
-        setIsListening(true);
+        recognition.start();
       } catch (err) {
-        console.error("Speech recognition start failed:", err);
+        console.error(err);
       }
     }
   };
+
+  recognitionRef.current = recognition;
+
+  return () => recognition.stop();
+}, []); // Run once
+
+// Update language dynamically
+useEffect(() => {
+  if (recognitionRef.current) recognitionRef.current.lang = language;
+}, [language]);
+
+const toggleListening = () => {
+  if (!recognitionRef.current) return;
+
+  if (isListeningRef.current) {
+    recognitionRef.current.stop();
+    setIsListening(false);
+    isListeningRef.current = false;
+  } else {
+    try {
+      recognitionRef.current.start();
+      setIsListening(true);
+      isListeningRef.current = true;
+    } catch (err) {
+      console.error(err);
+      setIsListening(false);
+      isListeningRef.current = false;
+    }
+  }
+};
+
 
   // Get user location
   const getLocation = () => {
@@ -101,6 +134,20 @@ export default function ReportIssue() {
       }
     );
   };
+  const handleUpvote = (issueID) => {
+  setDuplicateIssues((prev) =>
+    prev.map((issue) =>
+      issue.ID === issueID
+        ? {
+            ...issue,
+            upvoted: !issue.upvoted,
+            votes: issue.upvoted ? (issue.votes || 1) - 1 : (issue.votes || 0) + 1,
+          }
+        : issue
+    )
+  );
+  // Later connect to backend: axios.post(`/api/issues/${issueID}/upvote`)
+};
 
   useLayoutEffect(() => {
     getLocation();
@@ -120,12 +167,14 @@ export default function ReportIssue() {
   };
 
   // Form submission
+  const [duplicateIssues, setDuplicateIssues] = useState([]);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const sendForm = new FormData();
     sendForm.append("pic", pic);
     sendForm.append("data", JSON.stringify(formData));
-
+    console.log(formData)
     try {
       const res = await axios.post("http://localhost/submitissue", sendForm, {
         headers: {
@@ -139,22 +188,46 @@ export default function ReportIssue() {
         setFormData(formDataStruct);
         console.log("form data set to default");
 
-        setPic(null);
-        setError(null);
-        getLocation();
-        // Navigate back to user dashboard after successful submission
-        // setTimeout(() => {
-        //   navigate("/user");
-        // }, 2000);
-      } else {
-        setResID("Couldn't save to database, try again");
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.message || err);
+      setPic(null);
+      setError(null);
+      getLocation();
+      // Navigate back to user dashboard after successful submission
+      // setTimeout(() => {
+      //   navigate("/user");
+      // }, 2000);
+    } else {
+      setResID("Couldn't save to database, try again");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError(err.message || err);
+  }
+};
+//  try {
+//     // 🔹 TEMPORARY MOCK (remove when backend is ready)
+//     const checkRes = {
+//       data: {
+//         duplicate: true,
+//         similarIssues: [
+//           { issue: "Pothole near main road", location: { lat: 28.61, lng: 77.23 } },
+//           { issue: "Broken streetlight", location: { lat: 28.62, lng: 77.24 } },
+//         ],
+//       },
+//     };
 
+//     if (checkRes.data.duplicate) {
+//       setDuplicateIssues(checkRes.data.similarIssues);
+//       setShowDuplicateModal(true);
+//       return;
+//     }
+
+//     // Normal submit continues here
+//     await submitIssue();
+  // } catch (err) {
+  //   console.error(err);
+  //   setError(err.message || err);
+  // }
+// };
   return (
     <div className="flex flex-col bg-white min-h-screen">
       <NavbarUser />
@@ -461,6 +534,17 @@ export default function ReportIssue() {
               </button>
             </div>
           </form>
+           <DuplicateIssueModal
+    open={showDuplicateModal}
+    issues={duplicateIssues}
+    onCancel={() => setShowDuplicateModal(false)}
+    onConfirm={() => {
+      setShowDuplicateModal(false);
+      submitIssue();
+    onUpvote = {handleUpvote};
+    }}
+    onUpvote = {handleUpvote}
+  />
         </div>
       </div>
 

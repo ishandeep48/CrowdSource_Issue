@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         enum:['user'],
         default:'user'
+    },
+    blocked:{
+        type:Boolean,
+        default:false
     }
     //ADD MORE KEYS HERE FOR MORE DATA LATER
 })

@@ -9,6 +9,14 @@ const adminSchema = new mongoose.Schema({
     },
     password:{
         type:String,
+    },
+    role:{
+        type:String,
+        enum:['admin'],
+        default:'admin'
+    },
+    department:{
+        type:String,
     }
     // May add more data here in the future
 })

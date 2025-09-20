@@ -15,6 +15,7 @@ import Signin from "./pages/Signin";
 import ReportIssue from "./components/User/ReportIssue";
 import ProfilePage from "./components/User/Profile";
 import ReportedIssuesPage from "./components/User/ReportedIssuesPanel";
+import AreaIssuesPage from "./components/User/AreaIssuesPage";
 
 export default function App() {
   return (
@@ -63,6 +64,10 @@ export default function App() {
           </ProtectedUser>
         }
       />
+      <Route
+       path="/area-issues"
+        element=
+        {<AreaIssuesPage />} /> 
     </Routes>
   );
 }
