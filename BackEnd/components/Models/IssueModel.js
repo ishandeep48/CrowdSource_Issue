@@ -48,6 +48,9 @@ const issueSchema = new mongoose.Schema({
   },
   upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  state:{
+    type:String,
+  }
 });
 issueSchema.index({ location: "2dsphere" });
 const Issue = mongoose.models.Issue || mongoose.model("Issue", issueSchema);

@@ -23,7 +23,7 @@ import Heatmap from "./Heatmap"; // Assuming Heatmap component is in this path
 import { useJsApiLoader } from "@react-google-maps/api";
 import FilterToolbars from "./FilterToolbar";
 import IssuesTables from "./IssuesTable";
-import ProfilePages from "./ProfilePage";
+import ProfilePage from "./ProfilePage";
 import IssueModals from "./IssueModal";
 import Sidebars from "./Sidebar";
 import DashboardCardss from "./DashboardCards";
@@ -55,12 +55,12 @@ const CivicSevaAdminDashboard = () => {
   });
 
   // Mock data
-  const [issues,setIssues] = useState([{}]);
+  const [issues,setIssues] = useState([]);
   // Get all the counts from the backend
   useEffect(() => {
     const getIssueCount = async () => {
       try {
-        const response = await axios.get("http://localhost/admin/issueDetails");
+        const response = await axios.get("http://localhost/admin/issueDetails", {withCredentials:true});
         if (response.data.message) {
           const counts = response.data.data;
           console.log(counts)
@@ -74,7 +74,7 @@ const CivicSevaAdminDashboard = () => {
     };
     const getAllIssues = async()=>{
       try{
-        const response = await axios.get('http://localhost/admin/issues');
+        const response = await axios.get('http://localhost/admin/issues',{withCredentials:true});
         if(response.data.message){
           const iss = response.data.data;
           setIssues(iss);
@@ -187,7 +187,7 @@ const CivicSevaAdminDashboard = () => {
   const handlePriorityChange = async(ID, priority) =>{
     // alert(`ID: ${ID}, Priority: ${priority}`);
     try{
-      const response = await axios.post('http://localhost/admin/changePriority',{ID,priority});
+      const response = await axios.post('http://localhost/admin/changePriority',{ID,priority},{withCredentials:true});
       const data = response.data;
       if(data.message){
         alert('changed Priority')
@@ -207,7 +207,7 @@ const CivicSevaAdminDashboard = () => {
     />
   );
 
-  const ProfilePage = () => <ProfilePages />;
+  // const ProfilePage = () => <ProfilePages />; why tf is this line of code here
 
   const PlaceholderPage = ({ title, description }) => (
     <div className="bg-white rounded-lg shadow-md p-6 text-center">
@@ -219,7 +219,9 @@ const CivicSevaAdminDashboard = () => {
   const renderMainContent = () => {
     switch (currentPage) {
       case "profile":
-        return <ProfilePage />;
+        return <ProfilePage 
+        adminData ={localStorage.getItem('userDetail')}
+        />;
       case "departments":
         return (
           <PlaceholderPage

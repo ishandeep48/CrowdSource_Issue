@@ -5,21 +5,17 @@ import path from "path";
 import cloudinary from "../Middleware/cloudinary.js";
 import Issue from "../Models/IssueModel.js";
 import User from "../Models/UserModel.js";
-import { randomID,getNearbyIssues } from "../functions/helper.js";
+import { randomID,getNearbyIssues,getStateName } from "../functions/helper.js";
 import { Client } from "@gradio/client";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import { authenticateTokenUser } from "../Middleware/authCookie.js";
-dotenv.config();
+// dotenv.config();
 
 const router = express.Router();
 const upload = multer();
 
-router.post(
-  "/submitissue",
-  authenticateTokenUser,
-  upload.single("pic"),
-  async (req, res) => {
-    const APIURL = process.env.AI_ENDPOINT;
+router.post("/submitissue",authenticateTokenUser,upload.single("pic"),async (req, res) => {
+    // const APIURL = process.env.AI_ENDPOINT;
     // console.log(APIURL)
     let tempPic = "";
     try {
@@ -41,16 +37,18 @@ router.post(
         folder: "CrowdIssues",
         resource_type: "image",
       });
+      // Get state name
+      const state = await getStateName(data.location.lat, data.location.lng);
       //  This is how you get nearby Issues
       // console.log(await getNearbyIssues(data.location))
       // currently stores like this will be changed when I add Authentication
       // TODO
-      // const client = await Client.connect(APIURL);
-      // const API_result = await client.predict("/predict", {
-      //   text: data.issue,
-      // });
-      // const API_data = API_result.data[0];
-      // console.log(API_data);
+      const client = await Client.connect("Amii2410/Category_API");
+      const API_result = await client.predict("/predict", {
+        text: data.issue,
+      });
+      const API_data = API_result.data[0];
+      console.log(API_data);
       const issueData = {
         ID: randomID(),
         location: {
@@ -64,7 +62,8 @@ router.post(
         // description: API_data.Complaint,
 
         description: data.issue,
-        // department: API_data.Predicted_Category, // may change based on the API Update
+        state,
+        department: API_data.label, // may change based on the API Update
       };
       const newIssue = new Issue(issueData);
       await newIssue.save();

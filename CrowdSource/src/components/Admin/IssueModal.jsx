@@ -30,13 +30,13 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
 
         <div className="p-6 space-y-6">
           <div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">{issue.description}</h3>
-            {/* <p className="text-gray-600">{issue.description}</p> */}
+            <h3 className="text-lg font-medium text-gray-800 mb-2">{issue.department} Issue</h3>
+            <p className="text-gray-600">{issue.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
               <p className="text-sm text-gray-600">{issue.department}</p>
             </div>
             <div>
@@ -44,8 +44,8 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
               <p className="text-sm text-gray-600">{issue?.priority}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <p className="text-sm text-gray-600">Location here</p>
+              <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+              <p className="text-sm text-gray-600">{issue?.state}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Reported Date</label>

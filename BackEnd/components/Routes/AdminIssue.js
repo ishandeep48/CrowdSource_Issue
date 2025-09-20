@@ -1,12 +1,13 @@
 import express from "express";
 import Issue from "../Models/IssueModel.js";
 import axios from "axios";
-import { getStateFromDisplayName } from "../functions/helper.js";
+import { authenticateTokenAdmin } from "../Middleware/authCookie.js";
+// import { getStateFromDisplayName } from "../functions/helper.js";
 const router = express.Router();
 
-router.get('/allissues', async (req, res) => {
+router.get('/allissues',authenticateTokenAdmin, async (req, res) => {
     try{
-        const issues = await Issue.find({}).select('_id ID status reportedAt imgURL priority location description');
+        const issues = await Issue.find({}).select('_id ID status reportedAt imgURL priority state location description');
         return res.status(200).json({success:true, issues:issues});
     }catch(err){
         console.log(err);
@@ -14,7 +15,7 @@ router.get('/allissues', async (req, res) => {
     }
 })
 
-router.get('/admin/issueDetails',async(req,res)=>{
+router.get('/admin/issueDetails', authenticateTokenAdmin,async(req,res)=>{
 
     const issues = await Issue.find({});
     // console.log(issues)
@@ -32,7 +33,7 @@ router.get('/admin/issueDetails',async(req,res)=>{
 })
 
 
-router.get('/admin/issues',async(req,res)=>{
+router.get('/admin/issues',authenticateTokenAdmin , async(req,res)=>{
     try{
         const issues = await Issue.find({}).sort({createdAt:-1}).populate('reportedBy','name email phone');
         res.status(200).json({message:true, data:issues});
@@ -43,7 +44,7 @@ router.get('/admin/issues',async(req,res)=>{
 })
 
 
-router.post('/admin/changePriority', async(req,res)=>{
+router.post('/admin/changePriority', authenticateTokenAdmin , async(req,res)=>{
     const {ID, priority} = req.body;
     if(!ID || !priority){
         return res.status(400).json({message:false, error:"All fields are required"});

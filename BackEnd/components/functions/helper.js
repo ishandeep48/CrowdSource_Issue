@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import Issue from "../Models/IssueModel.js";
 import indianStatesAndUTs from "./states.js";
+import axios from "axios";
 dotenv.config();
 // Random ID generator
 export function randomID(num = 10) {
@@ -34,7 +35,7 @@ export async function getNearbyIssues(location, distanceInMeters = 200) {
   return nearbyIssues;
 }
 
-export function getStateFromDisplayName(displayName) {
+function getStateFromDisplayName(displayName) {
   const parts = displayName.split(",").map((s) => s.trim());
   const state = parts.find((part) => indianStatesAndUTs.includes(part));
   return state || null; // returns null if not found
