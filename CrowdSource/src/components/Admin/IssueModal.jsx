@@ -41,7 +41,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-              <p className="text-sm text-gray-600">{issue.priority}</p>
+              <p className="text-sm text-gray-600">{issue?.priority}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>

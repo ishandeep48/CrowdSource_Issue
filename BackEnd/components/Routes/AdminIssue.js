@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/allissues', async (req, res) => {
     try{
-        const issues = await Issue.find({}).select('_id location description');
+        const issues = await Issue.find({}).select('_id ID status reportedAt imgURL priority location description');
         return res.status(200).json({success:true, issues:issues});
     }catch(err){
         console.log(err);
