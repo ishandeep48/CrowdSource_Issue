@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
-export function randomID(num =20){
+export function randomID(num =10){
     const ID = nanoid(num);
     return ID;
 }

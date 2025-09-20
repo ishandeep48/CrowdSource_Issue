@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { hashPassword, SECRET_KEY } from "../functions/helper.js";
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
-import { authenticateToken } from "../Middleware/authCookie.js";
+import { authenticateTokenUser } from "../Middleware/authCookie.js";
 
 router.post("/user/register", async (req, res) => {
   // console.log(req.body)
@@ -47,7 +47,7 @@ router.post("/user/register", async (req, res) => {
   }
 });
 
-router.get("/auth/check", authenticateToken, (req, res) => {
+router.get("/auth/check", authenticateTokenUser, (req, res) => {
   // this is from where i send the ok signal to frontend protected routes check this if u need help
   // @Komal @Anusha if u wanna see how i did the authentication stuff the look in that file
   res.json({
@@ -88,13 +88,18 @@ router.post("/user/login", async (req, res) => {
       { expiresIn: "20d" }
     );
     console.log("LOGIN DONE")
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // set to true in production
       sameSite: "strict",
       maxAge: 20 * 24 * 60 * 60 * 1000,
     });
-    res.status(200).json({ message: true });
+    res.status(200).json({ message: true , user:{
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    }});
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: false , error:"Server Error"});

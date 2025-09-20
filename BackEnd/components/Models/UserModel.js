@@ -31,4 +31,6 @@ const userSchema = new mongoose.Schema({
     //ADD MORE KEYS HERE FOR MORE DATA LATER
 })
 
-export default mongoose.model("User",userSchema)
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+export default User;

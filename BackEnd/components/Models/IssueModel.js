@@ -57,4 +57,6 @@ const issueSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model("Issue", issueSchema);
+const Issue = mongoose.models.Issue || mongoose.model("Issue", issueSchema);
+
+export default Issue;

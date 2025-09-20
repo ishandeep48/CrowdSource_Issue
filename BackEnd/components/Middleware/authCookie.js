@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../functions/helper.js";
 
-export async function authenticateToken(req, res, next) {
+export async function authenticateTokenUser(req, res, next) {
   const token = req.cookies.token;
 //   console.log(token)
     if (!token) {
@@ -9,7 +9,12 @@ export async function authenticateToken(req, res, next) {
     }
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
+        console.log(decoded)
+        if(decoded.role !== 'user'){
+            return res.status(403).json({ message: "Forbidden" });
+        }
         req.user = decoded;
+        
         next();
     } catch (err) {
         return res.status(403).json({ message: "Invalid token" });

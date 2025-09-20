@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { hashPassword, SECRET_KEY } from "../functions/helper.js";
 import Admin from "../models/AdminModel.js";
 import jwt from "jsonwebtoken";
-import { authenticateToken } from "../Middleware/authCookie.js";
+// import { authenticateToken } from "../Middleware/authCookie.js";
 
 router.post("/admin/register", async (req, res) => {
   const { name, email, password } = req.body;

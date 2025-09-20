@@ -4,20 +4,26 @@ import fs from "fs";
 import path from "path";
 import cloudinary from "../Middleware/cloudinary.js";
 import Issue from "../Models/IssueModel.js";
+import User from '../Models/UserModel.js';
 import { randomID } from "../functions/helper.js";
 import { Client } from "@gradio/client";
 import dotenv from "dotenv";
+import { authenticateTokenUser } from "../Middleware/authCookie.js";
 dotenv.config();
 
 const router = express.Router();
 const upload = multer();
 
-router.post("/submitissue", upload.single("pic"), async (req, res) => {
+router.post("/submitissue",authenticateTokenUser, upload.single("pic"), async (req, res) => {
   const APIURL = process.env.AI_ENDPOINT;
   // console.log(APIURL)
   let tempPic = "";
   try {
     const data = JSON.parse(req.body.data);
+    console.log('data is',data);
+    const user = req.user;
+    const email = user.email;
+    const userID = await User.findOne({email}).select('_id');
     const ext = req.file.originalname.split(".").pop();
     // store the pic in a temporary location
     tempPic = path.join(
@@ -31,22 +37,26 @@ router.post("/submitissue", upload.single("pic"), async (req, res) => {
       folder: "CrowdIssues",
       resource_type: "image",
     });
-
+    
     // currently stores like this will be changed when I add Authentication
     // TODO
-    const client = await Client.connect(APIURL);
-    const API_result = await client.predict("/predict", {
-      text: data.issue,
-    });
-    const API_data = API_result.data[0];
-    console.log(API_data);
+    // const client = await Client.connect(APIURL);
+    // const API_result = await client.predict("/predict", {
+    //   text: data.issue,
+    // });
+    // const API_data = API_result.data[0];
+    // console.log(API_data);
     const issueData = {
       ID: randomID(),
       location: data.location,
-      priority: API_data.Priority.toLowerCase(),
+      // priority: API_data.Priority.toLowerCase(),
+      priority : data.priority,
       imgURL: result.secure_url,
-      description: API_data.Complaint,
-      department: API_data.Predicted_Category, // may change based on the API Update
+      reportedBy : userID._id,
+      // description: API_data.Complaint,
+
+      description : data.issue,
+      // department: API_data.Predicted_Category, // may change based on the API Update
     };
     const newIssue = new Issue(issueData);
     await newIssue.save();
