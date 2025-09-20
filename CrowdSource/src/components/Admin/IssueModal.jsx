@@ -23,39 +23,39 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
 
         <div className="p-6 space-y-6">
           <div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">{issue.title}</h3>
-            <p className="text-gray-600">{issue.description}</p>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">{issue?.title}</h3>
+            <p className="text-gray-600">{issue?.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <p className="text-sm text-gray-600">{issue.category}</p>
+              <p className="text-sm text-gray-600">{issue?.category}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-              <p className="text-sm text-gray-600">{issue.priority}</p>
+              <p className="text-sm text-gray-600">{issue?.priority}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <p className="text-sm text-gray-600">{issue.location}</p>
+              <p className="text-sm text-gray-600">{issue?.location}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Reported Date</label>
-              <p className="text-sm text-gray-600">{issue.reportedDate}</p>
+              <p className="text-sm text-gray-600">{issue?.reportedDate}</p>
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Citizen Information</label>
-            <p className="text-sm text-gray-600">{issue.citizenName} - {issue.citizenPhone}</p>
+            <p className="text-sm text-gray-600">{issue?.citizenName} - {issue?.citizenPhone}</p>
           </div>
 
-          {issue.lat && issue.lng && (
+          {issue?.lat && issue?.lng && (
             <div className="location-map">
               <h4 className="font-medium text-gray-800 mb-2">Location Map</h4>
               <div style={{ width: "100%", height: "300px" }} className="rounded-lg overflow-hidden">
-                <Heatmap center={{ lat: issue.lat, lng: issue.lng }} />
+                <Heatmap center={{ lat: issue?.lat, lng: issue?.lng }} />
               </div>
             </div>
           )}
