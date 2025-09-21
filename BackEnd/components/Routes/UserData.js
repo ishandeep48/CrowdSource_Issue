@@ -44,12 +44,12 @@ router.get("/user/profile", authenticateTokenUser, async (req, res) => {
 
 
 router.post('/user/nearbyissues', authenticateTokenUser, async(req,res)=>{
-  const {location} = req.body;
+  const {location,distance} = req.body;
   console.log(location);
   if(!location || !location.lat || !location.lng){
     return res.json({success:false, error:"Location is required"});
   }
-  const nearbyIssues = await getNearbyIssues(location, 1500);
+  const nearbyIssues = await getNearbyIssues(location, distance*1000);
   return res.status(200).json({success:true, issues: nearbyIssues});
 })
 
