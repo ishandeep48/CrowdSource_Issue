@@ -16,6 +16,7 @@ import ReportIssue from "./components/User/ReportIssue";
 import ProfilePage from "./components/User/Profile";
 import ReportedIssuesPage from "./components/User/ReportedIssuesPanel";
 import AreaIssuesPage from "./components/User/AreaIssuesPage";
+import DepartmentDashboard from "./components/Department/DepartmentDashboard";
 
 export default function App() {
   return (
@@ -57,13 +58,13 @@ export default function App() {
         }
       />
       <Route
-        path="/area-issues"
-        element={
-          <ProtectedUser>
-            <AreaIssuesPage />
-          </ProtectedUser>
-        }
-      />
+       path="/area-issues"
+        element=
+        {<ProtectedUser><AreaIssuesPage /></ProtectedUser>} /> 
+      <Route
+      path="/dept-dashboard"
+      element= {<DepartmentDashboard />} />
+      
     </Routes>
   );
 }
