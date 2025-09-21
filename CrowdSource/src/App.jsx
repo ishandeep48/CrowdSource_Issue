@@ -16,6 +16,7 @@ import ReportIssue from "./components/User/ReportIssue";
 import ProfilePage from "./components/User/Profile";
 import ReportedIssuesPage from "./components/User/ReportedIssuesPanel";
 import AreaIssuesPage from "./components/User/AreaIssuesPage";
+import DepartmentDashboard from "./components/Department/DepartmentDashboard";
 
 export default function App() {
   return (
@@ -68,6 +69,10 @@ export default function App() {
        path="/area-issues"
         element=
         {<AreaIssuesPage />} /> 
+      <Route
+      path="/dept-dashboard"
+      element= {<DepartmentDashboard />} />
+      
     </Routes>
   );
 }
