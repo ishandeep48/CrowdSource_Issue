@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 import bcrypt from "bcrypt";
 import { hashPassword, SECRET_KEY } from "../functions/helper.js";
-import Admin from "../models/AdminModel.js";
+import Admin from "../Models/AdminModel.js";
 import jwt from "jsonwebtoken";
 import { authenticateTokenAdmin,authenticateTokenDept } from "../Middleware/authCookie.js";
 
