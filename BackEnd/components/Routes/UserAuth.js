@@ -116,4 +116,31 @@ router.post('/user/logout', (req, res) => {
     res.json({ message: true });
 })
 
+
+
+router.post('/user/updatePassword', authenticateTokenUser,async(req,res)=>{
+  const user = req.user;
+  const {current, newPass} = req.body;
+  if(!current || !newPass){
+    return res.status(400).json({message:false, error:"All fields are required"});
+  }
+  try{
+    const userData = await User.findOne({email:user.email});
+    // console.log(userData)
+    if(!userData){
+      return res.status(404).json({message:false, error:"User not found"});
+    }
+    const isMatch = await bcrypt.compare(current, userData.password);
+    if(!isMatch){
+      return res.status(400).json({message:false, error:"Current password is incorrect"});
+    }
+    const hashedPassword = await hashPassword(newPass);
+    userData.password = hashedPassword;
+    await userData.save();
+    return res.status(200).json({message:true});
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({message:false, error:"Couldnt update password"});
+  }
+})
 export default router;

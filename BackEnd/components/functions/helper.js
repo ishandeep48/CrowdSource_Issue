@@ -19,7 +19,7 @@ export async function hashPassword(password) {
 }
 
 // Get nearby issues within a certain distance (in meters) from a given location
-export async function getNearbyIssues(location, distanceInMeters = 200) {
+export async function getNearbyIssues(location, distanceInMeters = 1000) {
   const nearbyIssues = await Issue.find({
     location: {
       $near: {
@@ -30,7 +30,7 @@ export async function getNearbyIssues(location, distanceInMeters = 200) {
         $maxDistance: distanceInMeters,
       },
     },
-  });
+  }).populate('reportedBy', 'name email');
 
   return nearbyIssues;
 }
@@ -55,4 +55,21 @@ export async function getStateName(lat, lon) {
   console.log(state);
   return state || null;
 }
+
+export async function getSameDeptIssues(department, location) {
+  const issues = await getNearbyIssues(location);
+
+  const twoWeeksAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+
+  const filtered = issues.filter(
+    (issue) =>
+      issue.department === department &&
+      issue.status !== "resolved" &&
+      issue.status !== "cancelled" &&
+      new Date(issue.reportedAt).getTime() > twoWeeksAgo
+  );
+
+  return filtered;
+}
+
 export const SECRET_KEY = process.env.SECKEY;

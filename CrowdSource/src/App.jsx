@@ -20,22 +20,14 @@ import AreaIssuesPage from "./components/User/AreaIssuesPage";
 export default function App() {
   return (
     <Routes>
-      {/* <Route path="/" element={<Home />} /> */}
-      {/* <Route path="/heatmap" element={<Heatmap />} /> */}
-      {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
-      {/* <Route path="/admin/" element={<Dashboard />} /> */}
       <Route path="/" element={<Home />} />
-      {/* <Route path="/heatmap" element={<Heatmap />} /> */}
-      {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
       <Route path="/admin/" element={<Dashboard />} />
-
-      {/* <Route path="/admin" element={<Admin/>}/> */}
       <Route
         path="/user"
         element={
           <ProtectedUser>
             <User />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route path="/signup" element={<Signup />} />
@@ -45,7 +37,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ReportIssue />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route
@@ -53,7 +45,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ProfilePage />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route
@@ -61,13 +53,17 @@ export default function App() {
         element={
           <ProtectedUser>
             <ReportedIssuesPage />
-          </ProtectedUser>
+         </ProtectedUser>
         }
       />
       <Route
-       path="/area-issues"
-        element=
-        {<AreaIssuesPage />} /> 
+        path="/area-issues"
+        element={
+          <ProtectedUser>
+            <AreaIssuesPage />
+          </ProtectedUser>
+        }
+      />
     </Routes>
   );
 }
