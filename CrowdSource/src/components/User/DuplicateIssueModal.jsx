@@ -22,9 +22,9 @@ export default function DuplicateIssueModal({ open, issues, onConfirm, onCancel,
               className="p-3 border rounded-lg bg-gray-50 text-gray-700 shadow-sm flex justify-between items-center"
             >
               <div>
-                <p className="font-medium">{issue.issue}</p>
+                <p className="font-medium">{issue.description}</p>
                 <p className="text-sm text-gray-500">
-                  Priority: {issue.priority} | Date:{" "}
+                  Priority: {issue.priority.toUpperCase()} | Date:{" "}
                   {new Date(issue.reportedAt).toLocaleDateString()}
                 </p>
               </div>

@@ -31,6 +31,12 @@ const userSchema = new mongoose.Schema({
     blocked:{
         type:Boolean,
         default:false
+    },
+    warns:{
+        type:Number,
+        default:0,
+        min:0,
+        max:3
     }
     //ADD MORE KEYS HERE FOR MORE DATA LATER
 })

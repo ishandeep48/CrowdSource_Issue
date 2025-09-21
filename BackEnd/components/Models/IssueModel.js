@@ -19,7 +19,7 @@ const issueSchema = new mongoose.Schema({
   status: {
     type: String,
     // required:true,
-    enum: ["reported", "reviewed", "forwarded", "resolved", "cancelled"],
+    enum: ["reported", "forwarded", "resolved", "cancelled"],
     default: "reported",
   },
   location: {

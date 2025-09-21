@@ -10,6 +10,11 @@ export async function getCategory(issueText) {
 
 
 export async function getPriority(issueText,category,complaints = 1, upvotes = 1) {
+    if(category=='Roads'){
+        category = 'road';
+    }else{
+        category = category.toLowerCase()
+    }
     const client = await Client.connect("Amii2410/new_priority_api");
     const API_result = await client.predict("/handle_complaint", {
       text: issueText,
@@ -29,3 +34,13 @@ export async function getDuplicate(currentIssueText , nearbyIssues){
 	});
     return result.data[0];
 }
+
+
+export async function checkSpam(issueText){
+    const client = await Client.connect("Amii2410/SPAM_API");
+    const result = await client.predict("/predict", {
+        text: issueText
+    });
+    return result.data[0].spam;
+}
+

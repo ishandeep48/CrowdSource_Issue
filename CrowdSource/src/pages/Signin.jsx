@@ -9,7 +9,7 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Citizen");
   const navigate = useNavigate();
-  const handleSignup = async() => {
+  const handleSignup = async () => {
     // alert(`Pressed! Role: ${role}`);
     console.log({
       role,
@@ -17,31 +17,37 @@ export default function Signin() {
       password,
     });
     const toSend = {
-      email,password,role
-    }
-    try{
-      const postTo = (role=='Citizen') ? 'http://localhost/user/login' : 'http://localhost/admin/login'
-      const result = await axios.post(postTo,toSend,{
-        withCredentials: true // check the signup page line 41
-      })
+      email,
+      password,
+      role,
+    };
+    try {
+      const postTo =
+        role == "Citizen"
+          ? "http://localhost/user/login"
+          : "http://localhost/admin/login";
+      const result = await axios.post(postTo, toSend, {
+        withCredentials: true, // check the signup page line 41
+      });
       const response = result.data;
       // console.log(response)
-      if(response.message){
-        console.log(response.user)
-        localStorage.setItem('userDetail',JSON.stringify(response.user))
+      if (response.message) {
+        console.log(response.user);
+        localStorage.setItem("userDetail", JSON.stringify(response.user));
         const userType = response.user.role;
-        if(userType=='user'){
-          navigate('/user')
-        }else if ( userType == 'admin'){
-          navigate('/admin')
+        if (userType == "user") {
+          navigate("/user");
+        } else if (userType == "admin") {
+          navigate("/admin");
         }
-      }else{
+      } else if (response.code == "BAN") {
+        alert("You are Banned Please Contact Admin");
+      } else {
         //Failure show some error based on what response you get
-        alert('cloudnt login')
+        alert("cloudnt login");
       }
-
-    }catch(err){
-      alert('smth went wrong')
+    } catch (err) {
+      alert("smth went wrong");
       //make some handling logic
     }
   };
@@ -51,8 +57,9 @@ export default function Signin() {
       <header className="w-full bg-white">
         <div className="max-w-7xl mx-auto flex items-center justify-start py-[clamp(0.75rem,2vw,1.25rem)] px-[clamp(1rem,3vw,2rem)]">
           <div className="text-2xl lg:text-3xl font-bold text-black">
-          <span className="text-black">Civic</span><span className="text-[#1E5EFF]">Sewa</span>
-        </div>
+            <span className="text-black">Civic</span>
+            <span className="text-[#1E5EFF]">Sewa</span>
+          </div>
         </div>
       </header>
 
@@ -112,7 +119,7 @@ export default function Signin() {
             onClick={handleSignup}
             className="mt-2 bg-[#1E5EFF] hover:bg-[#164bcc] text-white text-[clamp(0.9rem,2vw,1rem)] font-bold py-[clamp(0.75rem,2vw,1rem)] px-8 rounded-md shadow-md transition-colors duration-200 w-full"
           >
-            Sign up
+            Sign in
           </button>
           <div className="mt-4 text-sm text-[#5E5E5E] font-semibold">
             Don't have an account?{" "}

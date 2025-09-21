@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { FaTimes, FaShare, FaExclamationTriangle } from "react-icons/fa";
+import { FaTimes, FaShare, FaExclamationTriangle,FaUserSlash } from "react-icons/fa";
 import Heatmap from "../Admin/Heatmap"; // adjust path if needed
-
+import axios from 'axios';
 const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
   if (!issue) return null;
   const [selectedPriority, setSelectedPriority] = useState(
@@ -15,6 +15,25 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
   const handleChangePriorityClick = () => {
     onChangePriority(issue.ID, selectedPriority); // pass issue ID + new priority
   };
+
+  const handleBan = async()=>{
+    // console.log(issue.reportedBy);
+    try{
+      const response = await axios.post('http://localhost/admin/warnUser',{ID:issue.reportedBy._id,issueID:issue.ID},{withCredentials:true});
+      const data = response.data;
+      if(data.success){
+        if(data.code=='WARN'){
+          alert(data.data)
+        }else if(data.code=='BAN'){
+          alert(data.data)
+        }
+      }else{
+        alert(data.error)
+      }
+      }catch(err){
+        console.warn(err)
+      }
+    }
 
   return (
     <div
@@ -165,13 +184,19 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
             onClick={onClose}
             className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
           >
-            Cancel
+            Close
           </button>
-          <button
+          {/* <button
             onClick={onForward}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <FaShare /> Forward
+          </button> */}
+          <button
+            onClick={handleBan}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+          >
+            <FaUserSlash /> Warn User and Cancel Report
           </button>
           <button
             onClick={handleChangePriorityClick}

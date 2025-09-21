@@ -3,10 +3,13 @@ import AdminIssue from './AdminIssue.js'
 import UserAuth from './UserAuth.js'
 import AdminAuth from './AdminAuth.js'
 import UserData from './UserData.js'
+import AdminActions from './AdminActions.js'
 export default function Routes(app){
     app.use('/',UserSubmit)
     app.use('/',AdminIssue)
     app.use('/',UserAuth)
     app.use('/',AdminAuth)
     app.use('/',UserData)
+    app.use('/',AdminActions)
+
 }

@@ -65,12 +65,41 @@ export default function AreaIssuesPage() {
     };
   }, [location, proximityInput]);
 
-  const handleUpvote = (id) => {
-    setIssues((prev) =>
-      prev.map((issue) =>
-        issue.id === id ? { ...issue, upvotes: issue.upvotes + 1 } : issue
-      )
-    );
+  const handleUpvote = async(id) => {
+    console.log(id);
+
+try{
+      const reponse = await axios.post('http://localhost/user/upvote',{issueID:id},{withCredentials:true});
+      const data = reponse.data;
+      if(data.success){
+        if(data.code =='ALREADY'){
+          console.log('already upvoted');
+          alert('You have already upvoted this issue')
+          // setResID(null)
+          // setError('You have already upvoted this issue');
+        }else if (data.code =='DONE'){
+          setIssues((prev) =>
+  prev.map((issue) =>
+    issue.ID === id
+      ? { ...issue, upvotes: [...issue.upvotes, data.userAdded] }
+      : issue
+  )
+);
+
+          // setError(null)
+          // setResID('Upvoted Successfully')
+        }
+      }
+    }catch(err){
+      console.error(err);
+      // setError(err);
+    }
+
+    // setIssues((prev) =>
+    //   prev.map((issue) =>
+    //     issue.id === id ? { ...issue, upvotes: issue.upvotes + 1 } : issue
+    //   )
+    // );
   };
 
   const handleViewDetails = (issue) => {
@@ -128,10 +157,10 @@ export default function AreaIssuesPage() {
                 onChange={(e) => {
                   const val = parseFloat(e.target.value);
                   if (val > 3) {
-                    setErrorModal("Proximity cannot be more than 3 km");
+                    // setErrorModal("Proximity cannot be more than 3 km");
                     setProximityInput(3);
                   } else if(val < 0.5){
-                    setErrorModal("Proximity cannot be less than 0.5 km");
+                    // setErrorModal("Proximity cannot be less than 0.5 km");
                     setProximityInput(0.5);
                   }else {
                     setProximityInput(val);

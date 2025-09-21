@@ -72,6 +72,10 @@ router.post("/user/login", async (req, res) => {
         // No User
       return res.json({ message: false, error: "Invalid credentials" });
     }
+    if (user.blocked) {
+        // User is blocked
+      return res.json({ message: false, error: "User is blocked" , code:"BAN"});
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
         // Password mismatch

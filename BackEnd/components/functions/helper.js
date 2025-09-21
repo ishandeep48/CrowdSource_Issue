@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import Issue from "../Models/IssueModel.js";
 import indianStatesAndUTs from "./states.js";
 import axios from "axios";
+import { getPriority } from "./AI_API.js";
 dotenv.config();
 // Random ID generator
 export function randomID(num = 10) {
@@ -52,7 +53,7 @@ export async function getStateName(lat, lon) {
   });
   const display_name = resp.data.display_name;
   const state = getStateFromDisplayName(display_name);
-  console.log(state);
+  // console.log(state);
   return state || null;
 }
 
@@ -72,4 +73,24 @@ export async function getSameDeptIssues(department, location) {
   return filtered;
 }
 
+
+export async function reCalculatePriority(issueID){
+  console.log('Priority recalculate trigerred')
+  const issue = await Issue.findOne({ID:issueID});
+  const old_priority = issue.priority;
+  const issueText= issue.description;
+  const category = issue.department;
+  const issuesWithSameDept = await getSameDeptIssues(category, {lat:issue.location.coordinates[1], lng:issue.location.coordinates[0]});
+  const totalUpvotes = issuesWithSameDept.reduce((sum, issue) => sum + issue.upvotes.length, 0);
+  const issueDeptLenght = issuesWithSameDept.length;
+
+  const new_priority = await getPriority(issueText,category,issueDeptLenght,totalUpvotes);
+  console.log(new_priority)
+  if(new_priority !== old_priority){
+    // Notify User also
+    issue.priority = new_priority;
+    await issue.save();
+  }
+  
+}
 export const SECRET_KEY = process.env.SECKEY;

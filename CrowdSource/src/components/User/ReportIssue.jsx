@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NavbarUser from "./NavbarUser";
 import DuplicateIssueModal from "./DuplicateIssueModal";
+import { set } from "mongoose";
 
 export default function ReportIssue() {
   const navigate = useNavigate();
@@ -134,19 +135,25 @@ const toggleListening = () => {
       }
     );
   };
-  const handleUpvote = (issueID) => {
-  setDuplicateIssues((prev) =>
-    prev.map((issue) =>
-      issue.ID === issueID
-        ? {
-            ...issue,
-            upvoted: !issue.upvoted,
-            votes: issue.upvoted ? (issue.votes || 1) - 1 : (issue.votes || 0) + 1,
-          }
-        : issue
-    )
-  );
-  // Later connect to backend: axios.post(`/api/issues/${issueID}/upvote`)
+  const handleUpvote = async(issueID) => {
+    console.log(issueID);
+    try{
+      const reponse = await axios.post('http://localhost/user/upvote',{issueID},{withCredentials:true});
+      const data = reponse.data;
+      if(data.success){
+        if(data.code =='ALREADY'){
+          console.log('already upvoted');
+          setResID(null)
+          setError('You have already upvoted this issue');
+        }else if (data.code =='DONE'){
+          setError(null)
+          setResID('Upvoted Successfully')
+        }
+      }
+    }catch(err){
+      console.error(err);
+      setError(err);
+    }
 };
 
   useLayoutEffect(() => {
@@ -196,38 +203,48 @@ const toggleListening = () => {
       //   navigate("/user");
       // }, 2000);
     } else {
-      setResID("Couldn't save to database, try again");
+      if(data.code === "DUPLICATE"){
+      setDuplicateIssues(data.issues);
+      setShowDuplicateModal(true);
+      }else if(data.code === "SPAM"){
+        setError("Issue detected as spam. Please Rephrase your issue with more clear words.");
+        return;
+      }else{
+      setError("Couldn't save to database, try again");
+      }
     }
   } catch (err) {
     console.error(err);
     setError(err.message || err);
   }
+  
 };
-//  try {
-//     // 🔹 TEMPORARY MOCK (remove when backend is ready)
-//     const checkRes = {
-//       data: {
-//         duplicate: true,
-//         similarIssues: [
-//           { issue: "Pothole near main road", location: { lat: 28.61, lng: 77.23 } },
-//           { issue: "Broken streetlight", location: { lat: 28.62, lng: 77.24 } },
-//         ],
-//       },
-//     };
+const handleForceSubmit = async(e) =>{
+  e.preventDefault();
+  const sendForm = new FormData();
+  sendForm.append("pic",pic);
+  sendForm.append('data',JSON.stringify(formData));
+  sendForm.append('dept',duplicateIssues[0].department);
+  console.log(sendForm)
+  try{
+    const response = await axios.post('http://localhost/forcesubmit',sendForm,{withCredentials:true});
+    const data= response.data;
+    if(data.success){
+      setResID(data.issueID);
+        setFormData(formDataStruct);
+        console.log("form data set to default");
 
-//     if (checkRes.data.duplicate) {
-//       setDuplicateIssues(checkRes.data.similarIssues);
-//       setShowDuplicateModal(true);
-//       return;
-//     }
-
-//     // Normal submit continues here
-//     await submitIssue();
-  // } catch (err) {
-  //   console.error(err);
-  //   setError(err.message || err);
-  // }
-// };
+      setPic(null);
+      setError(null);
+      getLocation();
+      setDuplicateIssues(null);
+      setShowDuplicateModal(false);
+    }
+  }catch(err){
+    console.error(err);
+    setError(err);
+  }
+}
   return (
     <div className="flex flex-col bg-white min-h-screen">
       <NavbarUser />
@@ -272,7 +289,10 @@ const toggleListening = () => {
               >
                 Issue Description
               </label>
-              <div className="mb-4">
+
+              {/* Language changer */}
+
+              {/* <div className="mb-4">
                 <label
                   htmlFor="language"
                   className="block text-gray-700 font-medium mb-2"
@@ -291,7 +311,7 @@ const toggleListening = () => {
 
                   <option value="hi-IN">हिंदी (Hindi)</option>
                 </select>
-              </div>
+              </div> */}
 
               <textarea
                 id="issue"
@@ -350,39 +370,6 @@ const toggleListening = () => {
                   </svg>
                 )}
               </button>
-            </div>
-
-            {/* Priority */}
-            <div>
-              <label
-                htmlFor="priority"
-                className="block text-lg font-semibold text-gray-800 mb-2"
-              >
-                Priority Level
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {priorityOptions.map((option) => (
-                  <div
-                    key={option}
-                    className={`p-3 border rounded-lg cursor-pointer text-center transition-all ${
-                      formData.priority === option
-                        ? option === "critical"
-                          ? "bg-red-100 border-red-500 text-red-700"
-                          : option === "high"
-                          ? "bg-orange-100 border-orange-500 text-orange-700"
-                          : option === "medium"
-                          ? "bg-yellow-100 border-yellow-500 text-yellow-700"
-                          : "bg-green-100 border-green-500 text-green-700"
-                        : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
-                    }`}
-                    onClick={() =>
-                      setFormData({ ...formData, priority: option })
-                    }
-                  >
-                    <span className="font-medium">{option.toUpperCase()}</span>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Location */}
@@ -538,11 +525,7 @@ const toggleListening = () => {
     open={showDuplicateModal}
     issues={duplicateIssues}
     onCancel={() => setShowDuplicateModal(false)}
-    onConfirm={() => {
-      setShowDuplicateModal(false);
-      submitIssue();
-    onUpvote = {handleUpvote};
-    }}
+    onConfirm={handleForceSubmit}
     onUpvote = {handleUpvote}
   />
         </div>
