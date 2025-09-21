@@ -10,7 +10,7 @@ export async function authenticateTokenUser(req, res, next) {
     }
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
-        console.log(decoded)
+        // console.log(decoded)
         if(decoded.role !== 'user'){
             return res.status(403).json({ message: "Forbidden" });
         }

@@ -1,44 +1,47 @@
 import { useState, useEffect } from "react";
 import NavbarUser from "./NavbarUser";
-
-// Mock data
-const mockIssues = [
-  {
-    id: "1",
-    title: "Pothole on Main Street",
-    description: "There's a large pothole causing traffic jams.",
-    imageUrl: "https://cdn.shopify.com/s/files/1/0274/7288/7913/files/MicrosoftTeams-image_32.jpg?v=1705315718",
-    postedBy: "John Doe",
-    location: "Main Street, Verdant City",
-    status: "Pending",
-    department: "Road Maintenance",
-    reportedAt: new Date("2025-09-20T10:30:00"),
-    upvotes: 5,
-  },
-  {
-    id: "2",
-    title: "Streetlight not working",
-    description: "The streetlight near Park Avenue is broken.",
-    imageUrl: "https://www.shutterstock.com/image-photo/broken-street-lamp-against-blue-600nw-2440253019.jpg",
-    postedBy: "Jane Smith",
-    location: "Park Avenue, Verdant City",
-    status: "In Progress",
-    department: "Electricity Department",
-    reportedAt: new Date("2025-09-21T08:15:00"),
-    upvotes: 8,
-  },
-];
+import axios from "axios";
 
 export default function AreaIssuesPage() {
+
   const [issues, setIssues] = useState([]);
   const [selectedIssue, setSelectedIssue] = useState(null); // for modal
-
+  const [location,setLocation] =useState({});
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation( {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          },)
+        
+      },
+      (err) => {
+      alert("Please allow location access to view nearby issues");
+      }
+    );
+  };
+  useEffect(()=>{
+    getLocation();
+  },[])
   useEffect(() => {
-    const sortedIssues = mockIssues.sort(
+    const getNearbyIssues = async () => {
+      const response = await axios.post("http://localhost/user/nearbyissues", {location},{ withCredentials: true });
+      const data = response.data.issues;
+      console.log(data);
+      const sortedIssues = data.sort(
       (a, b) => b.reportedAt - a.reportedAt
     );
     setIssues(sortedIssues);
-  }, []);
+    }
+    getNearbyIssues();
+    
+    
+  }, [location]);
 
   const handleUpvote = (id) => {
     setIssues((prev) =>
@@ -49,7 +52,7 @@ export default function AreaIssuesPage() {
   };
 
   const handleViewDetails = (issue) => {
-    setSelectedIssue(issue); // open modal
+    setSelectedIssue(issue);
   };
 
   const closeModal = () => {
@@ -60,37 +63,37 @@ export default function AreaIssuesPage() {
     <>
       <NavbarUser />
       <div className="min-h-screen bg-gray-100">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
             Reported Issues in Your Area
           </h1>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {issues.map((issue) => (
               <div
-                key={issue.id}
+                key={issue.ID}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer"
                 onClick={() => handleViewDetails(issue)}
               >
                 <img
-                  src={issue.imageUrl}
-                  alt={issue.title}
+                  src={issue.imgURL}
+                  alt={issue.description}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h2 className="text-xl font-semibold mb-2">{issue.title}</h2>
+                  <h2 className="text-xl font-semibold mb-2">{issue.department}</h2>
                   <p className="text-gray-600 mb-4">{issue.description}</p>
                   <div className="flex justify-between items-center">
                     <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      className="bg-blue-500 text-white px-2 sm:px-3 py-1 text-sm sm:text-base rounded hover:bg-blue-600"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleUpvote(issue.id);
+                        handleUpvote(issue.ID);
                       }}
                     >
-                      ▲ ({issue.upvotes})
+                      ▲ ({issue.upvotes.length})
                     </button>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-xs sm:text-sm text-gray-500">
                       {new Date(issue.reportedAt).toLocaleString()}
                     </span>
                   </div>
@@ -102,27 +105,27 @@ export default function AreaIssuesPage() {
 
         {/* Modal */}
         {selectedIssue && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+          <div className="fixed inset-0 flex items-center justify-center z-50  px-2 sm:px-0">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-lg w-full sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 relative">
               <button
-                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                className="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-700 hover:text-gray-900 text-lg"
                 onClick={closeModal}
               >
                 ✕
               </button>
               <img
-                src={selectedIssue.imageUrl}
-                alt={selectedIssue.title}
+                src={selectedIssue.imgURL}
+                alt={selectedIssue.department}
                 className="w-full h-48 object-cover rounded mb-4"
               />
-              <h2 className="text-2xl font-bold mb-2">{selectedIssue.title}</h2>
+              <h2 className="text-2xl font-bold mb-2">{selectedIssue.department}</h2>
               <p className="text-gray-700 mb-2">{selectedIssue.description}</p>
               <p className="text-sm text-gray-500 mb-1">
-                <strong>Posted By:</strong> {selectedIssue.postedBy}
+                <strong>Posted By:</strong> {selectedIssue.reportedBy.name}
               </p>
-              <p className="text-sm text-gray-500 mb-1">
+              {/* <p className="text-sm text-gray-500 mb-1">
                 <strong>Location:</strong> {selectedIssue.location}
-              </p>
+              </p> */}
               <p className="text-sm text-gray-500 mb-1">
                 <strong>Status:</strong> {selectedIssue.status}
               </p>
@@ -131,10 +134,10 @@ export default function AreaIssuesPage() {
               </p>
               <p className="text-sm text-gray-500 mb-1">
                 <strong>Reported On:</strong>{" "}
-                {selectedIssue.reportedAt.toLocaleString()}
+                {new Date(selectedIssue.reportedAt).toLocaleString()}
               </p>
               <p className="text-sm text-gray-500">
-                <strong>Upvotes:</strong> {selectedIssue.upvotes}
+                <strong>Upvotes:</strong> {selectedIssue.upvotes.length}
               </p>
             </div>
           </div>
