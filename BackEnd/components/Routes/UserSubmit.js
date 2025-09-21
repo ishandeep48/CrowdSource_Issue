@@ -31,7 +31,7 @@ router.post(
   async (req, res) => {
     // const APIURL = process.env.AI_ENDPOINT;
     // console.log(APIURL)
-    let tempPic = "";
+    // let tempPic = "";
     try {
       const data = JSON.parse(req.body.data);
       console.log("data is", data);
@@ -52,8 +52,8 @@ router.post(
 
       //First we get the department from the API
       const department = await getCategory(data.issue);
-      console.log('depart is',department);
-      console.log('locat is ',data.location)
+      console.log("depart is", department);
+      console.log("locat is ", data.location);
       // We check for all the issues in same area 1.5KM with same department
       const issuesWithSameDept = await getSameDeptIssues(
         department,
@@ -75,7 +75,7 @@ router.post(
             reportedAt: issue.reportedAt,
             priority: issue.priority,
             description: issue.description,
-            department : issue.department
+            department: issue.department,
           }));
         console.log(detailedDuplicates);
         if (detailedDuplicates.length > 0) {
@@ -89,17 +89,29 @@ router.post(
       }
 
       // store the pic in a temporary location
-      tempPic = path.join(
-        process.cwd(),
-        "issueImages",
-        "issue-" + Date.now() + `.${ext}`
-      );
-      fs.writeFileSync(tempPic, req.file.buffer);
+      // tempPic = path.join(
+      //   process.cwd(),
+      //   "issueImages",
+      //   "issue-" + Date.now() + `.${ext}`
+      // );
+      // fs.writeFileSync(tempPic, req.file.buffer);
       //upload to a folder in cloudinary CrowdIssues
-      const result = await cloudinary.uploader.upload(tempPic, {
-        folder: "CrowdIssues",
+      // const result = await cloudinary.uploader.upload(tempPic, {
+      //   folder: "CrowdIssues",
 
-        resource_type: "image",
+      //   resource_type: "image",
+      // });
+
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "CrowdIssues" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+        stream.end(req.file.buffer);
       });
 
       // Get state name
@@ -145,10 +157,10 @@ router.post(
       try {
         //delete the temporary fileu saved
         //   console.log(tempPic);
-        if (fs.existsSync(tempPic)) {
-          fs.unlinkSync(tempPic);
-          console.log("Temp file deleted:", tempPic);
-        }
+        // if (fs.existsSync(tempPic)) {
+        //   fs.unlinkSync(tempPic);
+        //   console.log("Temp file deleted:", tempPic);
+        // }
       } catch (unlinkErr) {
         console.error("Failed to delete temp file:", unlinkErr);
       }
@@ -156,8 +168,12 @@ router.post(
   }
 );
 
-router.post("/forcesubmit",authenticateTokenUser,upload.single("pic"), async (req, res) => {
-    let tempPic = "";
+router.post(
+  "/forcesubmit",
+  authenticateTokenUser,
+  upload.single("pic"),
+  async (req, res) => {
+    // let tempPic = "";
     try {
       const data = JSON.parse(req.body.data);
       const user = req.user;
@@ -165,19 +181,28 @@ router.post("/forcesubmit",authenticateTokenUser,upload.single("pic"), async (re
       const email = user.email;
       const userID = await User.findOne({ email }).select("_id");
       const ext = req.file.originalname.split(".").pop();
-      console.log(`Forced ${department}`)
-      tempPic = path.join(
-        process.cwd(),
-        "issueImages",
-        "issue-" + Date.now() + `.${ext}`
-      );
-      fs.writeFileSync(tempPic, req.file.buffer);
-      //upload to a folder in cloudinary CrowdIssues
-      const result = await cloudinary.uploader.upload(tempPic, {
-        folder: "CrowdIssues",
+      console.log(`Forced ${department}`);
 
-        resource_type: "image",
+
+      // tempPic = path.join(
+      //   process.cwd(),
+      //   "issueImages",
+      //   "issue-" + Date.now() + `.${ext}`
+      // );
+      // fs.writeFileSync(tempPic, req.file.buffer);
+      //upload to a folder in cloudinary CrowdIssues
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "CrowdIssues" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+        stream.end(req.file.buffer);
       });
+
       // Get state name
       const state = await getStateName(data.location.lat, data.location.lng);
 
@@ -215,14 +240,15 @@ router.post("/forcesubmit",authenticateTokenUser,upload.single("pic"), async (re
       });
     } finally {
       try {
+        console.log(`done`);
         //delete the temporary fileu saved
         //   console.log(tempPic);
-        if (fs.existsSync(tempPic)) {
-          fs.unlinkSync(tempPic);
-          console.log("Temp file deleted:", tempPic);
-        }
+        // if (fs.existsSync(tempPic)) {
+        //   fs.unlinkSync(tempPic);
+        //   console.log("Temp file deleted:", tempPic);
+        // }
       } catch (unlinkErr) {
-        console.error("Failed to delete temp file:", unlinkErr);
+        // console.error("Failed to delete temp file:", unlinkErr);
       }
     }
   }
