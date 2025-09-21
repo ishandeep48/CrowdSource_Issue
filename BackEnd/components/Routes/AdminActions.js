@@ -3,6 +3,7 @@ const router = express.Router();
 import User from "../Models/UserModel.js";
 import Issue from "../Models/IssueModel.js";
 import { authenticateTokenAdmin } from "../Middleware/authCookie.js";
+import { sendEmail,banMail, warnMail } from "../functions/Email.js";
 
 router.post("/admin/warnUser", authenticateTokenAdmin, async (req, res) => {
   try {
@@ -26,6 +27,7 @@ router.post("/admin/warnUser", authenticateTokenAdmin, async (req, res) => {
       user.warns++;
       await user.save();
       // Notify User
+        await warnMail(user.email,issueID);
       return res
         .status(200)
         .json({ success: true, data: "User warned", code: "WARN" });
@@ -34,6 +36,7 @@ router.post("/admin/warnUser", authenticateTokenAdmin, async (req, res) => {
       user.warns = 3;
       await user.save();
       // Notify User
+      await banMail(user.email,issueID);
       return res
         .status(200)
         .json({ success: true, data: "User blocked", code: "BAN" });
@@ -44,4 +47,8 @@ router.post("/admin/warnUser", authenticateTokenAdmin, async (req, res) => {
   }
 });
 
+
+// router.post('/test', async(req,res)=>{
+//     await sendEmail('ishandeep48@gmail.com' , 'subject' , 'body')
+// })
 export default router;

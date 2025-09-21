@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 import Issue from "../Models/IssueModel.js";
 import { authenticateTokenDept } from "../Middleware/authCookie.js";
-
+import { resolvedMail } from "../functions/Email.js";
 router.post("/dept/issueCount", async (req, res) => {
   const dept = req.body.dept;
   const issues = await Issue.find({ department: dept });
@@ -39,13 +39,18 @@ router.post("/dept/resolveIssue", authenticateTokenDept, async (req, res) => {
   try {
     const { issueID } = req.body;
     console.log(issueID);
-    const issue = await Issue.findOne({ ID: issueID });
+    const issue = await Issue.findOne({ ID: issueID }).populate("subscribers", "email _id");
     if (!issue) {
       return res
         .json({ success: false, message: "Issue not found" });
         }
     issue.status = "resolved";
     await issue.save();
+    // Notify User
+    for(const sub of issue.subscribers){
+        let mail = sub.email;
+        await resolvedMail(mail,issueID);
+    }
     return res.status(200).json({ success: true, message: "Issue resolved" });
   } catch (err) {
     console.log(err);

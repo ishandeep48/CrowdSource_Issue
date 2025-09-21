@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import Issue from "../Models/IssueModel.js";
-import { sendMessage } from "./helper.js";
+import { forwardedMail } from "./Email.js";
 
 export function startEscalationJob() {
   cron.schedule("* * * * *", async () => {
@@ -21,7 +21,8 @@ export function startEscalationJob() {
 
           for (const sub of issue.subscribers) {
             try {
-              await sendMessage(sub, `Issue "${issue.description}" has been forwarded ✅`);
+              await forwardedMail(sub.email, issue.ID);
+              console.log(` Notified subscriber ${sub._id}`);
             } catch (notifyErr) {
               console.error(` Failed to notify subscriber ${sub._id}:`, notifyErr);
             }

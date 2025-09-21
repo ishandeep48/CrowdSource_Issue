@@ -56,8 +56,6 @@ router.post("/user/register", async (req, res) => {
 });
 
 router.get("/auth/check", authenticateTokenUser, (req, res) => {
-  // this is from where i send the ok signal to frontend protected routes check this if u need help
-  // @Komal @Anusha if u wanna see how i did the authentication stuff the look in that file
   res.json({
     isAuthenticated: true,
     user: req.user,

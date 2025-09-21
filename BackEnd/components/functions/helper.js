@@ -5,6 +5,7 @@ import Issue from "../Models/IssueModel.js";
 import indianStatesAndUTs from "./states.js";
 import axios from "axios";
 import { getPriority } from "./AI_API.js";
+import { priorityChangeMail } from "./Email.js";
 dotenv.config();
 // Random ID generator
 export function randomID(num = 10) {
@@ -77,7 +78,7 @@ export async function getSameDeptIssues(department, location) {
 
 export async function reCalculatePriority(issueID){
   console.log('Priority recalculate trigerred')
-  const issue = await Issue.findOne({ID:issueID});
+  const issue = await Issue.findOne({ID:issueID}).populate('subscribers','email _id');
   const old_priority = issue.priority;
   const issueText= issue.description;
   const category = issue.department;
@@ -91,6 +92,10 @@ export async function reCalculatePriority(issueID){
     // Notify User also
     issue.priority = new_priority;
     await issue.save();
+    for(const sub of issue.subscribers){
+      let mail = sub.email;
+      await priorityChangeMail(mail,issueID,old_priority,new_priority);
+    }
   }
   
 }
