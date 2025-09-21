@@ -16,7 +16,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const getUserData = async () => {
-      const response = await axios.get("http://localhost/user/profile", {
+      const response = await axios.get("/user/profile", {
         withCredentials: true,
       });
       const userData = response.data;
@@ -29,7 +29,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost/user/logout",
+        "/user/logout",
         {},
         { withCredentials: true }
       );
@@ -49,7 +49,7 @@ export default function ProfilePage() {
     // Make a passowrd change route for user
     axios
       .post(
-        "http://localhost/user/updatePassword",
+        "/user/updatePassword",
         { current: currentPassword, newPass: newPassword },
         { withCredentials: true }
       )

@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NavbarUser from "./NavbarUser";
 import DuplicateIssueModal from "./DuplicateIssueModal";
-import { set } from "mongoose";
+// import { set } from "mongoose";
 
 export default function ReportIssue() {
   const navigate = useNavigate();
@@ -137,7 +137,7 @@ export default function ReportIssue() {
     console.log(issueID);
     try {
       const reponse = await axios.post(
-        "http://localhost/user/upvote",
+        "/user/upvote",
         { issueID },
         { withCredentials: true }
       );
@@ -185,7 +185,7 @@ export default function ReportIssue() {
     sendForm.append("data", JSON.stringify(formData));
     console.log(formData);
     try {
-      const res = await axios.post("http://localhost/submitissue", sendForm, {
+      const res = await axios.post("/submitissue", sendForm, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -231,7 +231,7 @@ export default function ReportIssue() {
     console.log(sendForm);
     try {
       const response = await axios.post(
-        "http://localhost/forcesubmit",
+        "/forcesubmit",
         sendForm,
         { withCredentials: true }
       );

@@ -24,8 +24,8 @@ export default function Signin() {
     try {
       const postTo =
         role == "Citizen"
-          ? "http://localhost/user/login"
-          : "http://localhost/admin/login";
+          ? "/user/login"
+          : "/admin/login";
       const result = await axios.post(postTo, toSend, {
         withCredentials: true, // check the signup page line 41
       });
@@ -38,7 +38,7 @@ export default function Signin() {
         if (userType == "user") {
           navigate("/user");
         } else if (userType == "admin") {
-          navigate("/admin");
+          navigate("/admin/");
         }else if(userType =="department"){
           navigate("/dept-dashboard")
         }

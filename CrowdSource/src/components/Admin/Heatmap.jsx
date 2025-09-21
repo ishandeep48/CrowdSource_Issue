@@ -34,7 +34,7 @@ export default function Heatmap({ center, showFilters=false, defZoom=5 }) {
     const getIssues = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get("http://localhost/allissues",{withCredentials:true});
+        const response = await axios.get("/allissues",{withCredentials:true});
         if (response.data && Array.isArray(response.data.issues)) {
         setIssues(response.data.issues);
       }

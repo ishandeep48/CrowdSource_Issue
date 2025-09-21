@@ -23,7 +23,7 @@ const ProfilePage = ({ adminData }) => {
     // alert(`Password changed to: ${pass.new}`)
     try {
       const response = await axios.post(
-        "http://localhost/admin/updatePassword",
+        "/admin/updatePassword",
         { email: parsedData.email, current: pass.current, newPass: pass.new },
         { withCredentials: true }
       );
@@ -39,7 +39,7 @@ const ProfilePage = ({ adminData }) => {
     }
   };
   const handleLogout = async() => {
-    await axios.post("http://localhost/admin/logout", {}, { withCredentials: true });
+    await axios.post("/admin/logout", {}, { withCredentials: true });
     localStorage.removeItem("userDetail");
     // window.location.reload();
     navigate('/');

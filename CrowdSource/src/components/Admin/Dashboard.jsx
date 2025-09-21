@@ -62,7 +62,7 @@ const CivicSevaAdminDashboard = () => {
     const getIssueCount = async () => {
       try {
         const response = await axios.get(
-          "http://localhost/admin/issueDetails",
+          "/admin/issueDetails",
           { withCredentials: true }
         );
         if (response.data.message) {
@@ -78,7 +78,7 @@ const CivicSevaAdminDashboard = () => {
     };
     const getAllIssues = async () => {
       try {
-        const response = await axios.get("http://localhost/admin/issues", {
+        const response = await axios.get("/admin/issues", {
           withCredentials: true,
         });
         if (response.data.message) {
@@ -194,7 +194,7 @@ const CivicSevaAdminDashboard = () => {
     // alert(`ID: ${ID}, Priority: ${priority}`);
     try {
       const response = await axios.post(
-        "http://localhost/admin/changePriority",
+        "/admin/changePriority",
         { ID, priority },
         { withCredentials: true }
       );

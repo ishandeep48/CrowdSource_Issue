@@ -19,7 +19,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
   const handleBan = async()=>{
     // console.log(issue.reportedBy);
     try{
-      const response = await axios.post('http://localhost/admin/warnUser',{ID:issue.reportedBy._id,issueID:issue.ID},{withCredentials:true});
+      const response = await axios.post('/admin/warnUser',{ID:issue.reportedBy._id,issueID:issue.ID},{withCredentials:true});
       const data = response.data;
       if(data.success){
         if(data.code=='WARN'){

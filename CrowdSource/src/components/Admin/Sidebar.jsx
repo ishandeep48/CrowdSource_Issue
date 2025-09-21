@@ -7,8 +7,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, currentPage, handleNavClick }) =
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <FaChartBar /> },
     { id: 'issues', label: 'Issues', icon: <FaFileAlt /> },
-    { id: 'departments', label: 'Departments', icon: <FaBuilding /> },
-    { id: 'reports', label: 'Reports', icon: <FaChartLine /> },
+    // { id: 'departments', label: 'Departments', icon: <FaBuilding /> },
+    // { id: 'reports', label: 'Reports', icon: <FaChartLine /> },
     { id: 'map', label: 'Map', icon: <FaMap /> },
     { id: 'profile', label: 'Profile', icon: <FaUser /> }
   ];

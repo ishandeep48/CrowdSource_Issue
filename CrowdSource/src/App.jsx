@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route , Navigate } from "react-router-dom";
 // import './App.css'
 
 import ProtectedUser from "./components/User/ProtectedUser";
@@ -17,18 +17,41 @@ import ProfilePage from "./components/User/Profile";
 import ReportedIssuesPage from "./components/User/ReportedIssuesPanel";
 import AreaIssuesPage from "./components/User/AreaIssuesPage";
 import DepartmentDashboard from "./components/Department/DepartmentDashboard";
+import ProtectedDept from "./components/Department/ProtectedDept";
+import ProtectedAdmin from "./components/Admin/ProtectedAdmin";
+import AutoRoute from "./components/AutoLogin";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/admin/" element={<Dashboard />} />
+      <Route
+        path="/"
+        element={
+          <AutoRoute>
+            <Home />
+          </AutoRoute>
+        }
+      />
+      {/* <Route path="/admin/" element={<Admin />} /> */}
+      {/* <Route
+        path="/admin/"
+        element={
+          <ProtectedAdmin>
+            <Admin />
+          </ProtectedAdmin>
+        }
+      /> */}
+      <Route path="/admin" element={
+        <ProtectedAdmin>
+          <Dashboard />
+        </ProtectedAdmin>
+        } />
       <Route
         path="/user"
         element={
           <ProtectedUser>
             <User />
-         </ProtectedUser>
+          </ProtectedUser>
         }
       />
       <Route path="/signup" element={<Signup />} />
@@ -38,7 +61,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ReportIssue />
-         </ProtectedUser>
+          </ProtectedUser>
         }
       />
       <Route
@@ -46,7 +69,7 @@ export default function App() {
         element={
           <ProtectedUser>
             <ProfilePage />
-         </ProtectedUser>
+          </ProtectedUser>
         }
       />
       <Route
@@ -54,17 +77,26 @@ export default function App() {
         element={
           <ProtectedUser>
             <ReportedIssuesPage />
-         </ProtectedUser>
+          </ProtectedUser>
         }
       />
       <Route
-       path="/area-issues"
-        element=
-        {<ProtectedUser><AreaIssuesPage /></ProtectedUser>} /> 
+        path="/area-issues"
+        element={
+          <ProtectedUser>
+            <AreaIssuesPage />
+          </ProtectedUser>
+        }
+      />
       <Route
-      path="/dept-dashboard"
-      element= {<DepartmentDashboard />} />
-      
+        path="/dept-dashboard"
+        element={
+          <ProtectedDept>
+            <DepartmentDashboard />
+          </ProtectedDept>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

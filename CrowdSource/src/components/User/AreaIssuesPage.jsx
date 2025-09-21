@@ -40,7 +40,7 @@ export default function AreaIssuesPage() {
     const getNearbyIssues = async () => {
       try {
         const response = await axios.post(
-          "http://localhost/user/nearbyissues",
+          "/user/nearbyissues",
           { location, distance: proximityInput },
           { withCredentials: true, signal: controller.signal }
         );
@@ -69,7 +69,7 @@ export default function AreaIssuesPage() {
     console.log(id);
 
 try{
-      const reponse = await axios.post('http://localhost/user/upvote',{issueID:id},{withCredentials:true});
+      const reponse = await axios.post('/user/upvote',{issueID:id},{withCredentials:true});
       const data = reponse.data;
       if(data.success){
         if(data.code =='ALREADY'){

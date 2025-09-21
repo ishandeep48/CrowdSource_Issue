@@ -38,7 +38,7 @@ export default function Signup() {
       password,
     };
     try {
-      const result = await axios.post("http://localhost/user/register", toSend,{
+      const result = await axios.post("/user/register", toSend,{
        withCredentials : true
        }); //ye jo withCredentials h wo secured cookie send krta h backend kojisse ki wo phir authenticate krte ki kya ye bnda is page ko access kr sakta h ya nahi
       const response = result.data;

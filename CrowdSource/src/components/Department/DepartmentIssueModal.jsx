@@ -17,7 +17,7 @@ const DepartmentIssueModal = ({ issue, onClose, onUpdateStatus }) => {
     // onUpdateStatus(issue.id, selectedStatus);
     console.log("Resolved :", issue.ID);
     try{
-      const response = await axios.post('http://localhost/dept/resolveIssue',{issueID:issue.ID},{withCredentials:true});
+      const response = await axios.post('/dept/resolveIssue',{issueID:issue.ID},{withCredentials:true});
       const data = response.data;
       if(data.success){
         alert(data.message)

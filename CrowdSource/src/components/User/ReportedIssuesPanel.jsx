@@ -15,7 +15,7 @@ export default function ReportedIssuesPage() {
 
   useEffect(() => {
     const getData = async () => {
-      const reponse = await axios.get("http://localhost/reportedissues", {
+      const reponse = await axios.get("/reportedissues", {
         withCredentials: true,
       });
       const issues = reponse.data.issues;

@@ -29,7 +29,7 @@ import DepartmentSidebar from "./DepartmentSidebar";
 import DepartmentDashboardCards from "./DepartmentDashboardCards";
 import { Navigate, useNavigate } from "react-router-dom";
 import ProfilePage  from "./DepartmentProfile";
-import { set } from "mongoose";
+// import { set } from "mongoose";
 
 const DepartmentDashboard = () => {
   const navigate = useNavigate();
@@ -82,7 +82,7 @@ useEffect(() => {
     const getIssueCount = async () => {
       try {
         const dept = JSON.parse(localStorage.getItem('userDetail')).department;
-        const response = await axios.post("http://localhost/dept/issueCount", {dept},{
+        const response = await axios.post("/dept/issueCount", {dept},{
           withCredentials: true,
         });
         const data = response.data;
@@ -97,7 +97,7 @@ useEffect(() => {
     };
     const getAllIssues = async () => {
       try{
-        const response = await axios.get('http://localhost/dept/allIssues',{withCredentials:true});
+        const response = await axios.get('/dept/allIssues',{withCredentials:true});
         const data = response.data;
         console.log(data)
         if(data.message){
