@@ -131,6 +131,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
                     lng: issue.location.coordinates[0],
                   }}
                   showFilters={false}
+                  defZoom={15}
                 />
               </div>
             </div>

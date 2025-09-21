@@ -23,10 +23,10 @@ router.get("/dept/allIssues", authenticateTokenDept, async (req, res) => {
   try {
     const user = req.user;
     const dept = user.department;
-    console.log(dept)
+    console.log(dept);
     const issues = await Issue.find({
       department: dept,
-    //   status: { $nin: ["cancelled", "reported"] }, // exclude both
+        status: { $in: ["forwarded", "resolved"] }, // exclude both
     }).populate("reportedBy", "name email phone");
     res.status(200).json({ message: true, data: issues });
   } catch (err) {
@@ -35,4 +35,23 @@ router.get("/dept/allIssues", authenticateTokenDept, async (req, res) => {
   }
 });
 
+router.post("/dept/resolveIssue", authenticateTokenDept, async (req, res) => {
+  try {
+    const { issueID } = req.body;
+    console.log(issueID);
+    const issue = await Issue.findOne({ ID: issueID });
+    if (!issue) {
+      return res
+        .json({ success: false, message: "Issue not found" });
+        }
+    issue.status = "resolved";
+    await issue.save();
+    return res.status(200).json({ success: true, message: "Issue resolved" });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Couldnt resolve issue" });
+  }
+});
 export default router;

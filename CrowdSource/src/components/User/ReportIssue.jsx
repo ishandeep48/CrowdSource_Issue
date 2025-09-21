@@ -33,79 +33,77 @@ export default function ReportIssue() {
   const isListeningRef = useRef(false);
   const recognitionRef = useRef(null);
 
-useEffect(() => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return;
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
 
-  const recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = language;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = language;
 
- recognition.onresult = (event) => {
-  let finalTranscript = "";
-  for (let i = event.resultIndex; i < event.results.length; ++i) {
-    if (event.results[i].isFinal) {
-      finalTranscript += event.results[i][0].transcript;
-    }
-  }
+    recognition.onresult = (event) => {
+      let finalTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
 
-  if (finalTranscript) {
-    setFormData((prev) => ({
-      ...prev,
-      issue: prev.issue + (prev.issue ? " " : "") + finalTranscript,
-    }));
-  }
-};
+      if (finalTranscript) {
+        setFormData((prev) => ({
+          ...prev,
+          issue: prev.issue + (prev.issue ? " " : "") + finalTranscript,
+        }));
+      }
+    };
 
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error", event.error);
+      setIsListening(false);
+      isListeningRef.current = false;
+    };
 
-  recognition.onerror = (event) => {
-    console.error("Speech recognition error", event.error);
-    setIsListening(false);
-    isListeningRef.current = false;
-  };
+    recognition.onend = () => {
+      if (isListeningRef.current) {
+        try {
+          recognition.start();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
 
-  recognition.onend = () => {
+    recognitionRef.current = recognition;
+
+    return () => recognition.stop();
+  }, []); // Run once
+
+  // Update language dynamically
+  useEffect(() => {
+    if (recognitionRef.current) recognitionRef.current.lang = language;
+  }, [language]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) return;
+
     if (isListeningRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      isListeningRef.current = false;
+    } else {
       try {
-        recognition.start();
+        recognitionRef.current.start();
+        setIsListening(true);
+        isListeningRef.current = true;
       } catch (err) {
         console.error(err);
+        setIsListening(false);
+        isListeningRef.current = false;
       }
     }
   };
-
-  recognitionRef.current = recognition;
-
-  return () => recognition.stop();
-}, []); // Run once
-
-// Update language dynamically
-useEffect(() => {
-  if (recognitionRef.current) recognitionRef.current.lang = language;
-}, [language]);
-
-const toggleListening = () => {
-  if (!recognitionRef.current) return;
-
-  if (isListeningRef.current) {
-    recognitionRef.current.stop();
-    setIsListening(false);
-    isListeningRef.current = false;
-  } else {
-    try {
-      recognitionRef.current.start();
-      setIsListening(true);
-      isListeningRef.current = true;
-    } catch (err) {
-      console.error(err);
-      setIsListening(false);
-      isListeningRef.current = false;
-    }
-  }
-};
-
 
   // Get user location
   const getLocation = () => {
@@ -135,26 +133,30 @@ const toggleListening = () => {
       }
     );
   };
-  const handleUpvote = async(issueID) => {
+  const handleUpvote = async (issueID) => {
     console.log(issueID);
-    try{
-      const reponse = await axios.post('http://localhost/user/upvote',{issueID},{withCredentials:true});
+    try {
+      const reponse = await axios.post(
+        "http://localhost/user/upvote",
+        { issueID },
+        { withCredentials: true }
+      );
       const data = reponse.data;
-      if(data.success){
-        if(data.code =='ALREADY'){
-          console.log('already upvoted');
-          setResID(null)
-          setError('You have already upvoted this issue');
-        }else if (data.code =='DONE'){
-          setError(null)
-          setResID('Upvoted Successfully')
+      if (data.success) {
+        if (data.code == "ALREADY") {
+          console.log("already upvoted");
+          setResID(null);
+          setError("You have already upvoted this issue");
+        } else if (data.code == "DONE") {
+          setError(null);
+          setResID("Upvoted Successfully");
         }
       }
-    }catch(err){
+    } catch (err) {
       console.error(err);
       setError(err);
     }
-};
+  };
 
   useLayoutEffect(() => {
     getLocation();
@@ -181,7 +183,7 @@ const toggleListening = () => {
     const sendForm = new FormData();
     sendForm.append("pic", pic);
     sendForm.append("data", JSON.stringify(formData));
-    console.log(formData)
+    console.log(formData);
     try {
       const res = await axios.post("http://localhost/submitissue", sendForm, {
         headers: {
@@ -195,56 +197,61 @@ const toggleListening = () => {
         setFormData(formDataStruct);
         console.log("form data set to default");
 
-      setPic(null);
-      setError(null);
-      getLocation();
-      // Navigate back to user dashboard after successful submission
-      // setTimeout(() => {
-      //   navigate("/user");
-      // }, 2000);
-    } else {
-      if(data.code === "DUPLICATE"){
-      setDuplicateIssues(data.issues);
-      setShowDuplicateModal(true);
-      }else if(data.code === "SPAM"){
-        setError("Issue detected as spam. Please Rephrase your issue with more clear words.");
-        return;
-      }else{
-      setError("Couldn't save to database, try again");
+        setPic(null);
+        setError(null);
+        getLocation();
+        // Navigate back to user dashboard after successful submission
+        // setTimeout(() => {
+        //   navigate("/user");
+        // }, 2000);
+      } else {
+        if (data.code === "DUPLICATE") {
+          setDuplicateIssues(data.issues);
+          setShowDuplicateModal(true);
+        } else if (data.code === "SPAM") {
+          setError(
+            "Issue detected as spam. Please Rephrase your issue with more clear words."
+          );
+          return;
+        } else {
+          setError("Couldn't save to database, try again");
+        }
       }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || err);
     }
-  } catch (err) {
-    console.error(err);
-    setError(err.message || err);
-  }
-  
-};
-const handleForceSubmit = async(e) =>{
-  e.preventDefault();
-  const sendForm = new FormData();
-  sendForm.append("pic",pic);
-  sendForm.append('data',JSON.stringify(formData));
-  sendForm.append('dept',duplicateIssues[0].department);
-  console.log(sendForm)
-  try{
-    const response = await axios.post('http://localhost/forcesubmit',sendForm,{withCredentials:true});
-    const data= response.data;
-    if(data.success){
-      setResID(data.issueID);
+  };
+  const handleForceSubmit = async (e) => {
+    e.preventDefault();
+    const sendForm = new FormData();
+    sendForm.append("pic", pic);
+    sendForm.append("data", JSON.stringify(formData));
+    sendForm.append("dept", duplicateIssues[0].department);
+    console.log(sendForm);
+    try {
+      const response = await axios.post(
+        "http://localhost/forcesubmit",
+        sendForm,
+        { withCredentials: true }
+      );
+      const data = response.data;
+      if (data.success) {
+        setResID(data.issueID);
         setFormData(formDataStruct);
         console.log("form data set to default");
 
-      setPic(null);
-      setError(null);
-      getLocation();
-      setDuplicateIssues(null);
-      setShowDuplicateModal(false);
+        setPic(null);
+        setError(null);
+        getLocation();
+        setDuplicateIssues(null);
+        setShowDuplicateModal(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err);
     }
-  }catch(err){
-    console.error(err);
-    setError(err);
-  }
-}
+  };
   return (
     <div className="flex flex-col bg-white min-h-screen">
       <NavbarUser />
@@ -402,14 +409,21 @@ const handleForceSubmit = async(e) =>{
                 className="border rounded-lg overflow-hidden shadow-md mb-4"
                 style={{ height: "400px" }}
               >
-                {isLoaded ? (
+                {loadError ? (
+                  <p className="text-red-500 p-4">
+                    Google Maps failed to load 😢
+                  </p>
+                ) : !isLoaded ? (
+                  <p className="p-4 text-gray-500">
+                    Loading map… (slow network detected)
+                  </p>
+                ) : (
                   <GoogleMap
                     mapContainerStyle={containerStyle}
-                    center={formData.location || {lat: 0, lng: 0}}
+                    center={formData.location || { lat: 0, lng: 0 }}
                     zoom={15}
                     onClick={mapClickHandler}
                     onLoad={handleMapLoad}
-                    // key={`${formData.location.lat}-${formData.location.lng}`}
                     options={{
                       streetViewControl: false,
                       mapTypeControl: false,
@@ -418,10 +432,6 @@ const handleForceSubmit = async(e) =>{
                   >
                     <Marker position={formData.location} />
                   </GoogleMap>
-                ) : (
-                  <div className="flex items-center justify-center h-full bg-gray-100">
-                    <p className="text-gray-500">Loading Map...</p>
-                  </div>
                 )}
               </div>
             </div>
@@ -521,13 +531,13 @@ const handleForceSubmit = async(e) =>{
               </button>
             </div>
           </form>
-           <DuplicateIssueModal
-    open={showDuplicateModal}
-    issues={duplicateIssues}
-    onCancel={() => setShowDuplicateModal(false)}
-    onConfirm={handleForceSubmit}
-    onUpvote = {handleUpvote}
-  />
+          <DuplicateIssueModal
+            open={showDuplicateModal}
+            issues={duplicateIssues}
+            onCancel={() => setShowDuplicateModal(false)}
+            onConfirm={handleForceSubmit}
+            onUpvote={handleUpvote}
+          />
         </div>
       </div>
 

@@ -31,6 +31,7 @@ export async function getNearbyIssues(location, distanceInMeters = 1000) {
         $maxDistance: distanceInMeters,
       },
     },
+    status: { $nin: ["cancelled", "resolved"] }, 
   }).populate('reportedBy', 'name email');
 
   return nearbyIssues;
@@ -92,5 +93,12 @@ export async function reCalculatePriority(issueID){
     await issue.save();
   }
   
+}
+
+export async function sendMessage(user, message) {
+  try{
+    console.log(user , message);
+    //some real emailing function
+  }catch(err){}
 }
 export const SECRET_KEY = process.env.SECKEY;

@@ -18,7 +18,7 @@ const FilterToolbar = ({ filters, handleFilterChange, clearFilters }) => (
       >
         <option value="">All Status</option>
         <option value="reported">Reported</option>
-        <option value="reviewed">Reviewed</option>
+        {/* <option value="reviewed">Reviewed</option> */}
         <option value="forwarded">Forwarded</option>
         <option value="resolved">Resolved</option>
         <option value="cancelled">Cancelled</option>
@@ -57,7 +57,7 @@ const FilterToolbar = ({ filters, handleFilterChange, clearFilters }) => (
         <option value="">All Departments</option>
         <option value="road">Road</option>
         <option value="water">Water</option>
-        <option value="garbage">Sanitation</option>
+        <option value="garbage">Garbage</option>
         <option value="electricity">Electricity</option>
         <option value="gas">Gas</option>
       </select>
@@ -73,4 +73,4 @@ const FilterToolbar = ({ filters, handleFilterChange, clearFilters }) => (
   </div>
 );
 
-export default FilterToolbar;
+export default React.memo(FilterToolbar);

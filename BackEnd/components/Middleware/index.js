@@ -3,6 +3,8 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookies from "cookie-parser";
+import { startEscalationJob } from "../functions/ForwardingSW.js";
+startEscalationJob();
 dotenv.config();
 const databaseURL = process.env.DB_CONNECTION_STRING;
 export default function middleware(app) {
@@ -16,6 +18,8 @@ export default function middleware(app) {
     .connect(databaseURL)
     .then(async () => {
       console.log("Connected to MongoDB Database");
+      startEscalationJob();
+      console.log('Escalation Started')
     })
     .catch(() => {
       console.log("Couldn't connect to the database");

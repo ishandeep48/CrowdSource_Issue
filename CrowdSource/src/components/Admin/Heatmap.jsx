@@ -9,11 +9,11 @@ import axios from "axios";
 
 
 
-export default function Heatmap({ center, showFilters=false }) {
+export default function Heatmap({ center, showFilters=false, defZoom=5 }) {
   const width = showFilters ? "75%" : "100%";
   const containerStyle = { width: width, height: "100%" };
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [zoom, setZoom] = useState(5);
+  const [zoom, setZoom] = useState(defZoom);
   const [issues, setIssues] = useState([]);
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [isLoading, setIsLoading] = useState(false);

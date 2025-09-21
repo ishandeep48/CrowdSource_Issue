@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IoDocumentTextOutline, IoTrendingUp } from "react-icons/io5";
 import { FaRegClock } from "react-icons/fa6";
 import { CiCircleCheck } from "react-icons/ci";
-import axios from 'axios'
+import axios from "axios";
 import {
   // FaChartBar,
   // FaFileAlt,
@@ -48,7 +48,7 @@ const CivicSevaAdminDashboard = () => {
   });
 
   const libraries = ["visualization"];
-  
+
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: API_KEY,
@@ -56,15 +56,18 @@ const CivicSevaAdminDashboard = () => {
   });
 
   // Mock data
-  const [issues,setIssues] = useState([]);
+  const [issues, setIssues] = useState([]);
   // Get all the counts from the backend
   useEffect(() => {
     const getIssueCount = async () => {
       try {
-        const response = await axios.get("http://localhost/admin/issueDetails", {withCredentials:true});
+        const response = await axios.get(
+          "http://localhost/admin/issueDetails",
+          { withCredentials: true }
+        );
         if (response.data.message) {
           const counts = response.data.data;
-          console.log(counts)
+          console.log(counts);
           setIssueCount(counts);
         } else {
           console.warn("Couldnt Reach the Server please check your internet");
@@ -73,19 +76,21 @@ const CivicSevaAdminDashboard = () => {
         console.error(err);
       }
     };
-    const getAllIssues = async()=>{
-      try{
-        const response = await axios.get('http://localhost/admin/issues',{withCredentials:true});
-        if(response.data.message){
+    const getAllIssues = async () => {
+      try {
+        const response = await axios.get("http://localhost/admin/issues", {
+          withCredentials: true,
+        });
+        if (response.data.message) {
           const iss = response.data.data;
           setIssues(iss);
-        }else{
-          console.warn('Couldnt get the data')
+        } else {
+          console.warn("Couldnt get the data");
         }
-      }catch(err){
-        console.error("Some Error Occured")
+      } catch (err) {
+        console.error("Some Error Occured");
       }
-    }
+    };
     getIssueCount();
     getAllIssues();
   }, []);
@@ -93,18 +98,14 @@ const CivicSevaAdminDashboard = () => {
     return (
       (filters.status === "" ||
         issue.status?.toLowerCase() === filters.status.toLowerCase()) &&
-
       (filters.state === "" ||
         issue.state?.toLowerCase().includes(filters.state.toLowerCase())) &&
-
       (filters.priority === "" ||
         issue.priority?.toLowerCase() === filters.priority.toLowerCase()) &&
-
       (filters.department === "" ||
         issue.department?.toLowerCase() === filters.department.toLowerCase())
     );
   });
-
 
   const summaryData = [
     {
@@ -188,22 +189,25 @@ const CivicSevaAdminDashboard = () => {
       filteredIssues={filteredIssues}
       openIssueModal={openIssueModal}
     />
-    
   );
-  const handlePriorityChange = async(ID, priority) =>{
+  const handlePriorityChange = async (ID, priority) => {
     // alert(`ID: ${ID}, Priority: ${priority}`);
-    try{
-      const response = await axios.post('http://localhost/admin/changePriority',{ID,priority},{withCredentials:true});
+    try {
+      const response = await axios.post(
+        "http://localhost/admin/changePriority",
+        { ID, priority },
+        { withCredentials: true }
+      );
       const data = response.data;
-      if(data.message){
-        alert('changed Priority')
-      }else{
-        alert(data.error)
+      if (data.message) {
+        alert("changed Priority");
+      } else {
+        alert(data.error);
       }
-    }catch(err){
-      console.warn(err)
+    } catch (err) {
+      console.warn(err);
     }
-  }
+  };
   const IssueModal = () => (
     <IssueModals
       issue={selectedIssue}
@@ -225,9 +229,7 @@ const CivicSevaAdminDashboard = () => {
   const renderMainContent = () => {
     switch (currentPage) {
       case "profile":
-        return <ProfilePage 
-        adminData ={localStorage.getItem('userDetail')}
-        />;
+        return <ProfilePage adminData={localStorage.getItem("userDetail")} />;
       case "departments":
         return (
           <PlaceholderPage
@@ -259,7 +261,7 @@ const CivicSevaAdminDashboard = () => {
               style={{ width: "100%", height: "600px" }}
               className="rounded-lg overflow-hidden"
             >
-              <Heatmap showFilters={true}/>
+              <Heatmap showFilters={true} />
             </div>
           </div>
         );
@@ -276,7 +278,7 @@ const CivicSevaAdminDashboard = () => {
 
   return (
     <>
-      {isLoaded ? (
+      {isLoaded && (
         <div className="min-h-screen bg-gray-100">
           <Sidebar />
           <div className="md:ml-64 transition-all duration-300 ease-in-out">
@@ -308,9 +310,11 @@ const CivicSevaAdminDashboard = () => {
           </div>
           <IssueModal />
         </div>
-      ) : (
-        <p>Cant load</p>
       )}
+      {loadError && (
+        <p className="text-red-500">Google Maps failed to load</p>
+      )}
+      {!isLoaded && !loadError && <p>Cant load</p>}
       {/* <LoadScript
         googleMapsApiKey={API_KEY}
         libraries={["visualization"]}

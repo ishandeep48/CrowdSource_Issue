@@ -9,12 +9,24 @@ import {
   FaTag,
 } from "react-icons/fa";
 import Heatmap from "../Admin/Heatmap"; // adjust path if needed
-
+import axios from 'axios';
 const DepartmentIssueModal = ({ issue, onClose, onUpdateStatus }) => {
   if (!issue) return null;
 
-  const handleStatusUpdate = () => {
-    onUpdateStatus(issue.id, selectedStatus);
+  const handleStatusUpdate = async() => {
+    // onUpdateStatus(issue.id, selectedStatus);
+    console.log("Resolved :", issue.ID);
+    try{
+      const response = await axios.post('http://localhost/dept/resolveIssue',{issueID:issue.ID},{withCredentials:true});
+      const data = response.data;
+      if(data.success){
+        alert(data.message)
+      }else{
+        alert(data.message)
+      }
+      }catch(err){
+        console.warn(err)
+    }
   };
 
   const getPriorityColor = (priority) => {
@@ -165,6 +177,7 @@ const DepartmentIssueModal = ({ issue, onClose, onUpdateStatus }) => {
                     lng: issue.location.coordinates[0],
                   }}
                   showFilters={false}
+                  defZoom={15}
                 />
               </div>
             </div>
