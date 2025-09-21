@@ -405,7 +405,7 @@ const handleForceSubmit = async(e) =>{
                 {isLoaded ? (
                   <GoogleMap
                     mapContainerStyle={containerStyle}
-                    center={formData.location}
+                    center={formData.location || {lat: 0, lng: 0}}
                     zoom={15}
                     onClick={mapClickHandler}
                     onLoad={handleMapLoad}

@@ -310,8 +310,8 @@ export default function ReportedIssuesPage() {
                           height: "100%",
                         }}
                         center={{
-                          lat: selectedIssue.location.coordinates[1],
-                          lng: selectedIssue.location.coordinates[0],
+                          lat: selectedIssue.location.coordinates[1] || 0,
+                          lng: selectedIssue.location.coordinates[0] || 0,
                         }}
                         zoom={13}
                         options={{

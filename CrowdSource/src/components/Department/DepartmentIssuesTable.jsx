@@ -11,24 +11,24 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
       ) : (
         filteredIssues.map((issue) => (
           <div
-            key={issue.id}
+            key={issue.ID}
             className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors"
           >
             <div className="flex justify-between items-start mb-2">
               <div className="flex-1 mr-2">
                 <h3 className="font-medium text-gray-900 text-sm leading-tight">
-                  {issue.title}
+                  {issue.description}
                 </h3>
                 <p className="text-xs text-gray-600 mt-1">
-                  {issue.location}
+                  {issue.state}
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <span
                   className={`px-2 py-1 text-xs leading-4 font-semibold rounded-full ${
-                    issue.priority === "High"
+                    issue.priority === "high"
                       ? "bg-red-100 text-red-800"
-                      : issue.priority === "Medium"
+                      : issue.priority === "medium"
                       ? "bg-yellow-100 text-yellow-800"
                       : "bg-green-100 text-green-800"
                   }`}
@@ -37,9 +37,9 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
                 </span>
                 <span
                   className={`px-2 py-1 text-xs leading-4 font-semibold rounded-full ${
-                    issue.status === "Resolved"
+                    issue.status === "resolved"
                       ? "bg-green-100 text-green-800"
-                      : issue.status === "In Progress"
+                      : issue.status === "forwarded"
                       ? "bg-yellow-100 text-yellow-800"
                       : "bg-orange-100 text-orange-800"
                   }`}
@@ -51,11 +51,11 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
             
             <div className="flex justify-between items-center mt-3">
               <div className="flex items-center gap-3">
-                <span className="px-2 py-1 text-xs leading-4 font-semibold rounded-full bg-blue-100 text-blue-800">
+                {/* <span className="px-2 py-1 text-xs leading-4 font-semibold rounded-full bg-blue-100 text-blue-800">
                   {issue.category}
-                </span>
+                </span> */}
                 <span className="text-xs text-gray-500">
-                  {issue.reportedDate}
+                  {new Date(issue.reportedAt).toLocaleDateString()}
                 </span>
               </div>
               <button
@@ -79,11 +79,11 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Issue Title
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Category
-              </th>
+              </th> */}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location
+                State
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Priority
@@ -108,24 +108,24 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
               </tr>
             ) : (
               filteredIssues.map((issue) => (
-                <tr key={issue.id} className="hover:bg-gray-50">
+                <tr key={issue.ID} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {issue.title}
+                    {issue.description}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {issue.category}
+                      {issue.department}
                     </span>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {issue.location}
+                    {issue.state}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        issue.priority === "High"
+                        issue.priority === "high"
                           ? "bg-red-100 text-red-800"
-                          : issue.priority === "Medium"
+                          : issue.priority === "medium"
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-green-100 text-green-800"
                       }`}
@@ -136,9 +136,9 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        issue.status === "Resolved"
+                        issue.status === "resolved"
                           ? "bg-green-100 text-green-800"
-                          : issue.status === "In Progress"
+                          : issue.status === "forwarded"
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-orange-100 text-orange-800"
                       }`}
@@ -147,7 +147,7 @@ const DepartmentIssuesTable = ({ filteredIssues, openIssueModal }) => (
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {issue.reportedDate}
+                    {new Date(issue.reportedAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button

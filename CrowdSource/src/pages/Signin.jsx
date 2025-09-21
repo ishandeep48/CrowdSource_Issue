@@ -39,12 +39,14 @@ export default function Signin() {
           navigate("/user");
         } else if (userType == "admin") {
           navigate("/admin");
+        }else if(userType =="department"){
+          navigate("/dept-dashboard")
         }
       } else if (response.code == "BAN") {
         alert("You are Banned Please Contact Admin");
       } else {
         //Failure show some error based on what response you get
-        alert("cloudnt login");
+        alert("Wrong Credentials");
       }
     } catch (err) {
       alert("smth went wrong");

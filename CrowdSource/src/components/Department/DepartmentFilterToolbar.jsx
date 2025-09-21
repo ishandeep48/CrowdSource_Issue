@@ -28,9 +28,9 @@ const DepartmentFilterToolbar = ({ filters, handleFilterChange, clearFilters }) 
         className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
       >
         <option value="">All Priorities</option>
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
       </select>
 
       {/* Status dropdown */}
@@ -40,9 +40,9 @@ const DepartmentFilterToolbar = ({ filters, handleFilterChange, clearFilters }) 
         className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
       >
         <option value="">All Statuses</option>
-        <option value="Pending">Pending</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Resolved">Resolved</option>
+        <option value="forwarded">Forwarded</option>
+        {/* <option value="reported">In Progress</option> */}
+        <option value="resolved">Resolved</option>
       </select>
 
       {/* Clear button */}

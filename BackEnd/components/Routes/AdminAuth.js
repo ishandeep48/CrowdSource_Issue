@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { hashPassword, SECRET_KEY } from "../functions/helper.js";
 import Admin from "../models/AdminModel.js";
 import jwt from "jsonwebtoken";
-import { authenticateTokenAdmin } from "../Middleware/authCookie.js";
+import { authenticateTokenAdmin,authenticateTokenDept } from "../Middleware/authCookie.js";
 
 router.post("/admin/register", async (req, res) => {
   const { name, email, password } = req.body;
@@ -91,11 +91,14 @@ router.post("/admin/login", async (req, res) => {
     if (!isMatch) {
       return res.json({ message: false, error: "Invalid credentials" });
     }
+    const role = admin.role;
+    const dept = (role == 'department') ? admin.department : null;
     const token = jwt.sign(
       {
         email: admin.email,
         name: admin.name,
-        role: "admin",
+        role: role,
+        department: dept,
       },
       SECRET_KEY,
       { expiresIn: "20d" }
@@ -112,11 +115,40 @@ router.post("/admin/login", async (req, res) => {
       email: admin.email,
       phone: admin.phone,
       role: admin.role,
+      department: dept,
     }});
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: false });
   }
 });
+
+
+
+router.post('/dept/updatePassword', authenticateTokenDept,async(req,res)=>{
+  const user = req.user;
+  const {current, newPass} = req.body;
+  if(!current || !newPass){
+    return res.status(400).json({message:false, error:"All fields are required"});
+  }
+  try{
+    const admin = await Admin.findOne({email:user.email});
+    console.log(admin)
+    if(!admin){
+      return res.status(404).json({message:false, error:"Admin not found"});
+    }
+    const isMatch = await bcrypt.compare(current, admin.password);
+    if(!isMatch){
+      return res.status(400).json({message:false, error:"Current password is incorrect"});
+    }
+    const hashedPassword = await hashPassword(newPass);
+    admin.password = hashedPassword;
+    await admin.save();
+    return res.status(200).json({message:true});
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({message:false, error:"Couldnt update password"});
+  }
+})
 
 export default router;

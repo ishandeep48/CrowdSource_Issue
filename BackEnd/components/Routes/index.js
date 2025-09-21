@@ -4,6 +4,8 @@ import UserAuth from './UserAuth.js'
 import AdminAuth from './AdminAuth.js'
 import UserData from './UserData.js'
 import AdminActions from './AdminActions.js'
+import DepartmentIssue from './DepartmentIssue.js'
+
 export default function Routes(app){
     app.use('/',UserSubmit)
     app.use('/',AdminIssue)
@@ -11,5 +13,7 @@ export default function Routes(app){
     app.use('/',AdminAuth)
     app.use('/',UserData)
     app.use('/',AdminActions)
+    app.use('/',DepartmentIssue)
+
 
 }

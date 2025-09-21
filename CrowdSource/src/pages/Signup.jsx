@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import icon from "../assets/loginicon.png";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -9,6 +9,7 @@ export default function Signup() {
   const [aadhaar, setAadhaar] = useState("1234-5678-9012");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
@@ -43,9 +44,14 @@ export default function Signup() {
       const response = result.data;
       if (response.message) {
         console.log(response);
+        localStorage.setItem("userDetail", JSON.stringify(response.user));
+        const userType = response.user.role;
+        if (userType == "user") {
+          navigate("/user");
+        }
         // navigate to somewhere ( make all the routes that user will be visiting as protected routes i have included in UserAuth.js /auth/check pr get request karo with some httpOnly Cookie )
       } else {
-        alert("Couldnt save"); // make something like make user re registere if he gets some error
+        alert("Couldnt Register"); // make something like make user re registere if he gets some error
       }
     } catch (err) {
       alert('smth went wronfg')

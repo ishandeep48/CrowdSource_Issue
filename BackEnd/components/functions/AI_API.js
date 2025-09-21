@@ -5,6 +5,9 @@ export async function getCategory(issueText) {
   const API_result = await client.predict("/predict", {
     text: issueText,
   });
+  if(API_result.data[0].label == 'Roads'){
+    return 'Road';
+  }
   return API_result.data[0].label;
 }
 
