@@ -138,7 +138,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
 
           {/* Actions Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Forward to Department
               </label>
@@ -147,7 +147,7 @@ const IssueModal = ({ issue, onClose, onForward, onChangePriority }) => {
                 <option>Water Department</option>
                 <option>Sanitation</option>
               </select>
-            </div>
+            </div> */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Change Priority
