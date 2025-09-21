@@ -41,8 +41,8 @@ const CivicSevaAdminDashboard = () => {
     resolved: 0,
   });
   const [filters, setFilters] = useState({
-    category: "",
-    location: "",
+    status: "",
+    state: "",
     priority: "",
     department: "",
   });
@@ -90,15 +90,20 @@ const CivicSevaAdminDashboard = () => {
   }, []);
   const filteredIssues = issues.filter((issue) => {
     return (
-      (filters.category === "" || issue.category === filters.category) &&
-      (filters.location === "" ||
-        issue.location
-          .toLowerCase()
-          .includes(filters.location.toLowerCase())) &&
-      (filters.priority === "" || issue.priority === filters.priority) &&
-      (filters.department === "" || issue.department === filters.department)
+      (filters.status === "" ||
+        issue.status?.toLowerCase() === filters.status.toLowerCase()) &&
+
+      (filters.state === "" ||
+        issue.state?.toLowerCase().includes(filters.state.toLowerCase())) &&
+
+      (filters.priority === "" ||
+        issue.priority?.toLowerCase() === filters.priority.toLowerCase()) &&
+
+      (filters.department === "" ||
+        issue.department?.toLowerCase() === filters.department.toLowerCase())
     );
   });
+
 
   const summaryData = [
     {
@@ -253,7 +258,7 @@ const CivicSevaAdminDashboard = () => {
               style={{ width: "100%", height: "600px" }}
               className="rounded-lg overflow-hidden"
             >
-              <Heatmap />
+              <Heatmap showFilters={true}/>
             </div>
           </div>
         );

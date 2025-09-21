@@ -7,7 +7,7 @@ const IssuesTable = ({ filteredIssues, openIssueModal }) => (
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-              Issue Title
+              Description
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/7">
               Department
@@ -31,22 +31,25 @@ const IssuesTable = ({ filteredIssues, openIssueModal }) => (
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {filteredIssues.map((issue) => (
-            <tr key={issue.id} className="hover:bg-gray-50">
-              {/* Description wraps properly now */}
+            <tr key={issue._id || issue.ID} className="hover:bg-gray-50">
+              {/* Description */}
               <td className="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs break-words">
                 {issue.description}
               </td>
 
+              {/* Department */}
               <td className="px-6 py-4 text-sm whitespace-nowrap">
                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                  {issue.department}
+                  {issue.department || "N/A"}
                 </span>
               </td>
 
+              {/* State */}
               <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                 {issue.state}
               </td>
 
+              {/* Priority */}
               <td className="px-6 py-4 whitespace-nowrap">
                 <span
                   className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -61,6 +64,7 @@ const IssuesTable = ({ filteredIssues, openIssueModal }) => (
                 </span>
               </td>
 
+              {/* Status */}
               <td className="px-6 py-4 whitespace-nowrap">
                 <span
                   className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -76,10 +80,14 @@ const IssuesTable = ({ filteredIssues, openIssueModal }) => (
                 </span>
               </td>
 
+              {/* Date */}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                {new Date(issue.reportedAt).toLocaleDateString()}
+                {issue.reportedAt
+                  ? new Date(issue.reportedAt).toLocaleDateString()
+                  : "N/A"}
               </td>
 
+              {/* Actions */}
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button
                   onClick={() => openIssueModal(issue)}

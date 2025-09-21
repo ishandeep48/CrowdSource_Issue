@@ -9,7 +9,7 @@ import axios from "axios";
 
 const containerStyle = { width: "75%", height: "100%" };
 
-export default function Heatmap({ center }) {
+export default function Heatmap({ center, showFilters=true }) {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [zoom, setZoom] = useState(5);
   const [issues, setIssues] = useState([]);
@@ -60,7 +60,12 @@ export default function Heatmap({ center }) {
   const filteredIssues = useMemo(() => {
     return issues.filter((issue) => {
       if (filters.priority !== "all" && issue.priority !== filters.priority) return false;
-      if (filters.department !== "all" && issue.department !== filters.department) return false;
+      
+      // FIXED: Make the department comparison case-insensitive and safe for missing properties.
+      if (filters.department !== "all" && issue.department?.toLowerCase() !== filters.department.toLowerCase()) {
+        return false;
+      }
+
       if (issue.reportCount < filters.minReports) return false;
       return true;
     });
@@ -100,6 +105,7 @@ export default function Heatmap({ center }) {
   return (
     <div style={{ display: "flex", height: "100%" }}>
       {/* --- FILTER PANEL --- */}
+      {showFilters && (
       <div
         style={{
           width: "25%",
@@ -140,6 +146,7 @@ export default function Heatmap({ center }) {
             <option value="sanitation">Sanitation</option>
             <option value="electricity">Electricity</option>
             <option value="water">Water</option>
+            <option value="gas">Gas</option>
           </select>
         </div>
 
@@ -153,7 +160,7 @@ export default function Heatmap({ center }) {
           />
         </div>
       </div>
-
+      )}
 
       {/* --- MAP SECTION --- */}
       <GoogleMap
