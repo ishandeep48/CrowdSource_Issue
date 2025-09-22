@@ -116,14 +116,14 @@ export default function ProfilePage() {
               {/* Profile Picture → First on mobile, right side on desktop */}
               <div className="order-1 md:order-2 flex flex-col items-center justify-center bg-white rounded-lg shadow-sm p-6">
                 <img
-                  src="https://via.placeholder.com/150"
+                  src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small_2x/default-avatar-icon-of-social-media-user-vector.jpg"
                   alt="Profile"
                   className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
                 />
                 <p className="mt-3 text-gray-600 text-sm">Profile Picture</p>
-                <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                {/* <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
                   Change Photo
-                </button>
+                </button> */}
               </div>
 
               {/* User Info → Below picture on mobile, left side on desktop */}
