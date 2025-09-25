@@ -85,6 +85,11 @@
 </details>
 
 ---
+## Workflow
+<img src ="./demoAssets/userWork.png" alt="User workflow " width ="800"/>
+
+User WorkFlow Diagram
+---
 
 ## 🚀 Getting Started
 
