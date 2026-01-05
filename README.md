@@ -1,8 +1,8 @@
-# 📍 CivicSewa - CrowdSource Issue Reporting Portal
+#  CivicSewa - CrowdSource Issue Reporting Portal
 
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-## ⚡ Tech Stack  
+##  Tech Stack  
 [![My Skills](https://skillicons.dev/icons?i=react,express,mongodb,nodejs,tailwind,vite,js,py )](https://skillicons.dev)
 ---
 
@@ -11,7 +11,7 @@
 ---
 
 
-## 📖 About the Project
+##  About the Project
 
 **CivicSewa** is a platform designed to bridge the gap between citizens and local authorities. It provides a user-friendly interface for reporting civic issues such as potholes, broken streetlights, and waste management problems. By crowdsourcing this information, the application aims to improve the efficiency of issue resolution and enhance community engagement.
 
@@ -25,7 +25,7 @@
 
 ---
 
-## ✨ Features
+##  Features
 
 -   **User Authentication**: Secure user registration and login system.
 -   **Issue Reporting**: Users can report issues with details like location, description, and images.
@@ -41,7 +41,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 
@@ -65,22 +65,22 @@
 ## 📸 Screenshots
 
 <details>
-  <summary>🖼️ User Report Page</summary>
+  <summary> User Report Page</summary>
   <img src="./demoAssets/userReport.png" alt="User Report Page" width="700"/>
 </details>
 
 <details>
-  <summary>🖼️ Nearby Reported Issues</summary>
+  <summary> Nearby Reported Issues</summary>
   <img src="./demoAssets/userArea.png" alt="Nearby Reported Issues" width="700"/>
 </details>
 
 <details>
-  <summary>🖼️ Department Dashboard</summary>
+  <summary> Department Dashboard</summary>
   <img src="./demoAssets/deptDash.png" alt=" Department Dashboard" width="700"/>
 </details>
 
 <details>
-  <summary>🖼️ Admin Heatmap page</summary>
+  <summary> Admin Heatmap page</summary>
   <img src="./demoAssets/adminHeatmap.png" alt="Admin Heatmap page" width="700"/>
 </details>
 
@@ -91,7 +91,7 @@
 User WorkFlow Diagram
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 To get a local copy up and running, follow these simple steps.
 
@@ -152,7 +152,7 @@ To get a local copy up and running, follow these simple steps.
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or create a pull request.
 
@@ -165,7 +165,7 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 
 ---
 
-## 📝 License
+##  License
 
 
     CivicSewa  © 2025 by Ishan Deep is licensed under CC BY-NC-ND 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-nd/4.0/
@@ -173,7 +173,18 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 
 ---
 
-## 📫 Contact
+## Team Members 
+
+Ishan Deep (ishandeep48)
+Atmika Khandelwal (Amii2410)
+Anusha Singh (Crystlfly)
+Shreya Anand (heheshreya)
+Kritika Mishra (itzkritz)
+Harshit Batra (N1CK99925)
+
+--
+
+##  Contact
 
 Ishan Deep - [ishandeep48@gmail.com](mailto:ishandeep48@gmail.com)
 
