@@ -175,12 +175,12 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 
 ## Team Members 
 
-*Ishan Deep (ishandeep48)
-*Atmika Khandelwal (Amii2410)
-*Anusha Singh (Crystlfly)
-*Shreya Anand (heheshreya)
-*Kritika Mishra (itzkritz)
-*Harshit Batra (N1CK99925)
+-   Ishan Deep (ishandeep48)
+-   Atmika Khandelwal (Amii2410)
+-   Anusha Singh (Crystlfly)
+-   Shreya Anand (heheshreya)
+-   Kritika Mishra (itzkritz)
+-   Harshit Batra (N1CK99925)
 
 ---
 
